@@ -1,0 +1,36 @@
+# Minecraft Pro - Python Bağımlılıkları
+# Çok oyunculu mod ve sunucu tarafı için gerekli paketler
+
+# Web Framework
+Flask==2.3.3
+Flask-CORS==4.0.0
+Flask-SocketIO==5.3.6
+
+# WebSocket Destekleri
+python-socketio==5.9.0
+eventlet==0.33.3
+
+# Veritabanı
+sqlite3
+
+# Güvenlik
+bcrypt==4.0.1
+PyJWT==2.8.0
+
+# JSON ve Veri İşleme
+json5==0.9.14
+
+# Loglama ve Monitoring
+loguru==0.7.2
+
+# Geliştirme Araçları
+python-dotenv==1.0.0
+black==23.9.1
+flake8==6.1.0
+
+# Test
+pytest==7.4.2
+pytest-flask==1.2.0
+
+# Performans
+gunicorn==21.2.0
