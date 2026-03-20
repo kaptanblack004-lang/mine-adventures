@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelime Savaşı - Online Bilgi Yarışması</title>
+    <link rel="stylesheet" href="src/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;900&family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <!-- Ana Menü -->
+    <div id="mainMenu" class="screen active">
+        <div class="menu-container">
+            <div class="logo">
+                <h1>🧠 KELİME SAVAŞI</h1>
+                <p class="tagline">Online Bilgi Yarışması</p>
+            </div>
+            
+            <div class="menu-buttons">
+                <button class="menu-btn primary" id="quickPlayBtn">
+                    <span class="btn-icon">⚡</span>
+                    <span class="btn-text">Hızlı Başla</span>
+                </button>
+                
+                <button class="menu-btn secondary" id="createRoomBtn">
+                    <span class="btn-icon">🏠</span>
+                    <span class="btn-text">Oda Oluştur</span>
+                </button>
+                
+                <button class="menu-btn secondary" id="joinRoomBtn">
+                    <span class="btn-icon">🔗</span>
+                    <span class="btn-text">Odaya Katıl</span>
+                </button>
+                
+                <button class="menu-btn secondary" id="profileBtn">
+                    <span class="btn-icon">👤</span>
+                    <span class="btn-text">Profil</span>
+                </button>
+                
+                <button class="menu-btn secondary" id="leaderboardBtn">
+                    <span class="btn-icon">🏆</span>
+                    <span class="btn-text">Liderlik Tablosu</span>
+                </button>
+                
+                <button class="menu-btn secondary" id="settingsBtn">
+                    <span class="btn-icon">⚙️</span>
+                    <span class="btn-text">Ayarlar</span>
+                </button>
+            </div>
+            
+            <div class="menu-footer">
+                <div class="online-count">
+                    <span class="online-dot"></span>
+                    <span id="onlineCount">1,234</span> çevrimiçi oyuncu
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Oda Oluştur Ekranı -->
+    <div id="createRoomScreen" class="screen">
+        <div class="room-container">
+            <button class="back-btn" id="backFromCreateBtn">← Geri</button>
+            
+            <h2>🏠 Oda Oluştur</h2>
+            
+            <div class="room-settings">
+                <div class="setting-group">
+                    <label for="roomName">Oda Adı</label>
+                    <input type="text" id="roomName" placeholder="Harika bir oda adı girin..." maxlength="30">
+                </div>
+                
+                <div class="setting-group">
+                    <label for="roomPassword">Şifre (İsteğe Bağlı)</label>
+                    <input type="password" id="roomPassword" placeholder="Odayı korumak için şifre...">
+                </div>
+                
+                <div class="setting-group">
+                    <label for="maxPlayers">Oyuncu Sayısı</label>
+                    <select id="maxPlayers">
+                        <option value="2">2 Oyuncu</option>
+                        <option value="4" selected>4 Oyuncu</option>
+                        <option value="6">6 Oyuncu</option>
+                        <option value="8">8 Oyuncu</option>
+                    </select>
+                </div>
+                
+                <div class="setting-group">
+                    <label for="gameMode">Oyun Modu</label>
+                    <select id="gameMode">
+                        <option value="classic" selected>Klasik Kelime</option>
+                        <option value="turbo">Turbo Mod</option>
+                        <option value="survival">Hayatta Kalma</option>
+                        <option value="teams">Takım Savaşı</option>
+                    </select>
+                </div>
+                
+                <div class="setting-group">
+                    <label for="roundTime">Tur Süresi</label>
+                    <select id="roundTime">
+                        <option value="30">30 Saniye</option>
+                        <option value="60" selected>60 Saniye</option>
+                        <option value="90">90 Saniye</option>
+                        <option value="120">120 Saniye</option>
+                    </select>
+                </div>
+                
+                <div class="setting-group">
+                    <label for="category">Kategori</label>
+                    <select id="category">
+                        <option value="all" selected>Tüm Kategoriler</option>
+                        <option value="general">Genel Kültür</option>
+                        <option value="science">Bilim</option>
+                        <option value="history">Tarih</option>
+                        <option value="sports">Spor</option>
+                        <option value="music">Müzik</option>
+                        <option value="movies">Sinema</option>
+                        <option value="technology">Teknoloji</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button class="menu-btn primary" id="createRoomConfirmBtn">
+                <span class="btn-icon">✨</span>
+                <span class="btn-text">Odayı Oluştur</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Odaya Katıl Ekranı -->
+    <div id="joinRoomScreen" class="screen">
+        <div class="room-container">
+            <button class="back-btn" id="backFromJoinBtn">← Geri</button>
+            
+            <h2>🔗 Odaya Katıl</h2>
+            
+            <div class="room-list">
+                <div class="room-filters">
+                    <input type="text" id="roomSearch" placeholder="Oda ara...">
+                    <select id="filterMode">
+                        <option value="all">Tüm Odalar</option>
+                        <option value="public">Herkese Açık</option>
+                        <option value="private">Şifreli</option>
+                        <option value="friends">Arkadaşlar</option>
+                    </select>
+                </div>
+                
+                <div class="rooms-container" id="roomsList">
+                    <!-- Odalar JavaScript ile doldurulacak -->
+                </div>
+            </div>
+            
+            <div class="join-with-code">
+                <h3>🎯 Kod ile Katıl</h3>
+                <div class="code-input">
+                    <input type="text" id="roomCode" placeholder="Oda kodunu girin..." maxlength="6">
+                    <button class="join-code-btn" id="joinWithCodeBtn">Katıl</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Oyun Odası -->
+    <div id="gameRoom" class="screen">
+        <div class="game-header">
+            <div class="room-info">
+                <h3 id="roomTitle">Oda Adı</h3>
+                <span class="room-code">Oda Kodu: <strong id="roomCodeDisplay">ABC123</strong></span>
+            </div>
+            
+            <div class="players-list">
+                <div class="player-slot" id="player1">
+                    <div class="player-avatar">👤</div>
+                    <div class="player-info">
+                        <span class="player-name">Oyuncu 1</span>
+                        <span class="player-score">0</span>
+                    </div>
+                </div>
+                <div class="player-slot" id="player2">
+                    <div class="player-avatar">👤</div>
+                    <div class="player-info">
+                        <span class="player-name">Bekleniyor...</span>
+                        <span class="player-score">0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="leave-room-btn" id="leaveRoomBtn">Odayı Terk Et</button>
+        </div>
+        
+        <div class="game-area">
+            <div class="word-display">
+                <div class="current-category">Kategori: <span id="currentCategory">Genel Kültür</span></div>
+                <div class="letter-grid" id="letterGrid">
+                    <!-- Harfler JavaScript ile doldurulacak -->
+                </div>
+                <div class="word-hint" id="wordHint">İpucu: Bu kelime bir meyvedir</div>
+            </div>
+            
+            <div class="input-area">
+                <input type="text" id="wordInput" placeholder="Kelimeyi yazın ve Enter'a basın..." maxlength="20">
+                <div class="input-actions">
+                    <button class="action-btn" id="shuffleBtn">🔀 Karıştır</button>
+                    <button class="action-btn" id="hintBtn">💡 İpucu</button>
+                    <button class="action-btn" id="skipBtn">⏭️ Pas</button>
+                </div>
+            </div>
+            
+            <div class="found-words" id="foundWords">
+                <h4>Bulunan Kelimeler</h4>
+                <div class="words-list">
+                    <!-- Bulunan kelimeler buraya eklenecek -->
+                </div>
+            </div>
+        </div>
+        
+        <div class="game-sidebar">
+            <div class="timer-section">
+                <div class="timer">
+                    <div class="timer-circle">
+                        <span id="timeLeft">60</span>
+                    </div>
+                    <div class="timer-label">SÜRE</div>
+                </div>
+            </div>
+            
+            <div class="chat-section">
+                <h4>💬 Sohbet</h4>
+                <div class="chat-messages" id="chatMessages">
+                    <!-- Sohbet mesajları buraya eklenecek -->
+                </div>
+                <div class="chat-input">
+                    <input type="text" id="chatInput" placeholder="Mesaj yazın..." maxlength="100">
+                    <button id="sendChatBtn">Gönder</button>
+                </div>
+            </div>
+            
+            <div class="powerups">
+                <h4>🎯 Güçlendirmeler</h4>
+                <div class="powerup-list">
+                    <div class="powerup-item">
+                        <span class="powerup-icon">⏰</span>
+                        <span class="powerup-name">Zaman Durdurma</span>
+                        <span class="powerup-count">3</span>
+                    </div>
+                    <div class="powerup-item">
+                        <span class="powerup-icon">🔤</span>
+                        <span class="powerup-name">Ekstra Harf</span>
+                        <span class="powerup-count">2</span>
+                    </div>
+                    <div class="powerup-item">
+                        <span class="powerup-icon">💡</span>
+                        <span class="powerup-name">Süper İpucu</span>
+                        <span class="powerup-count">1</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Liderlik Tablosu -->
+    <div id="leaderboardScreen" class="screen">
+        <div class="leaderboard-container">
+            <button class="back-btn" id="backFromLeaderboardBtn">← Geri</button>
+            
+            <h2>🏆 Liderlik Tablosu</h2>
+            
+            <div class="leaderboard-tabs">
+                <button class="tab-btn active" data-period="daily">Günlük</button>
+                <button class="tab-btn" data-period="weekly">Haftalık</button>
+                <button class="tab-btn" data-period="monthly">Aylık</button>
+                <button class="tab-btn" data-period="alltime">Tüm Zamanlar</button>
+            </div>
+            
+            <div class="leaderboard-content">
+                <div class="top-three">
+                    <div class="podium second">
+                        <div class="rank">2</div>
+                        <div class="player-avatar">🥈</div>
+                        <div class="player-name">Oyuncu2</div>
+                        <div class="player-score">8,750</div>
+                    </div>
+                    
+                    <div class="podium first">
+                        <div class="rank">1</div>
+                        <div class="player-avatar">🥇</div>
+                        <div class="player-name">Oyuncu1</div>
+                        <div class="player-score">9,250</div>
+                    </div>
+                    
+                    <div class="podium third">
+                        <div class="rank">3</div>
+                        <div class="player-avatar">🥉</div>
+                        <div class="player-name">Oyuncu3</div>
+                        <div class="player-score">7,500</div>
+                    </div>
+                </div>
+                
+                <div class="leaderboard-list" id="leaderboardList">
+                    <!-- Liderlik listesi JavaScript ile doldurulacak -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profil Ekranı -->
+    <div id="profileScreen" class="screen">
+        <div class="profile-container">
+            <button class="back-btn" id="backFromProfileBtn">← Geri</button>
+            
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <div class="avatar-image">👤</div>
+                    <button class="change-avatar-btn">Değiştir</button>
+                </div>
+                
+                <div class="profile-info">
+                    <h2 id="profileUsername">Kullanıcı Adı</h2>
+                    <div class="profile-stats">
+                        <div class="stat">
+                            <span class="stat-label">Seviye</span>
+                            <span class="stat-value" id="userLevel">15</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">XP</span>
+                            <span class="stat-value" id="userXP">2,450</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Toplam Skor</span>
+                            <span class="stat-value" id="totalScore">15,750</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="profile-sections">
+                <div class="section">
+                    <h3>🏆 Başarımlar</h3>
+                    <div class="achievements-grid">
+                        <div class="achievement unlocked">
+                            <div class="achievement-icon">🎯</div>
+                            <div class="achievement-name">İlk Kelime</div>
+                        </div>
+                        <div class="achievement unlocked">
+                            <div class="achievement-icon">🔥</div>
+                            <div class="achievement-name">5 Seri</div>
+                        </div>
+                        <div class="achievement locked">
+                            <div class="achievement-icon">👑</div>
+                            <div class="achievement-name">Kelime Ustası</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h3>📊 İstatistikler</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-number">127</span>
+                            <span class="stat-desc">Oyun Oynandı</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">1,245</span>
+                            <span class="stat-desc">Kelime Bulundu</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">89%</span>
+                            <span class="stat-desc">Başarı Oranı</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">45</span>
+                            <span class="stat-desc">Zafer</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h3>🎮 Geçmiş Oyunlar</h3>
+                    <div class="game-history" id="gameHistory">
+                        <!-- Geçmiş oyunlar JavaScript ile doldurulacak -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Ekranı -->
+    <div id="loadingScreen" class="loading-overlay">
+        <div class="loading-content">
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+            </div>
+            <h2>Yükleniyor...</h2>
+            <p>Oyun hazırlanıyor, lütfen bekleyin...</p>
+            <div class="loading-bar">
+                <div class="loading-progress"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bildirimler -->
+    <div id="notificationContainer" class="notification-container">
+        <!-- Bildirimler JavaScript ile eklenecek -->
+    </div>
+
+    <script src="src/js/game.js"></script>
+    <script src="src/js/ui.js"></script>
+    <script src="src/js/network.js"></script>
+    <script src="src/js/main.js"></script>
+</body>
+</html>
