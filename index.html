@@ -4,182 +4,209 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mine'in Maceraları - Profesyonel Hikaye Oyunu</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap">
     <link rel="stylesheet" href="static/css/style.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👑</text></svg>">
 </head>
 <body>
     <!-- Yüklenme Ekranı -->
     <div id="loading-screen" class="screen active">
-        <div class="loading-content">
-            <div class="loading-spinner"></div>
-            <h2 class="loading-text">Mine'in Maceraları Yükleniyor...</h2>
+        <div class="loading-container">
+            <div class="loading-logo">
+                <div class="logo-icon">👑</div>
+                <h1 class="logo-title">Mine'in Maceraları</h1>
+            </div>
             <div class="loading-progress">
                 <div class="progress-bar">
-                    <div class="progress-fill"></div>
+                    <div class="progress-fill" id="progress-fill"></div>
                 </div>
+                <p class="loading-text" id="loading-text">Oyun yükleniyor...</p>
+            </div>
+            <div class="loading-tips">
+                <p class="tip-text">💡 İpucu: Her seçim hikayeyi etkiler!</p>
             </div>
         </div>
     </div>
 
     <!-- Ana Menü -->
     <div id="main-menu" class="screen">
+        <div class="menu-background">
+            <div class="particles" id="particles"></div>
+        </div>
         <div class="menu-container">
-            <div class="game-logo">
-                <h1 class="game-title">Mine'in Maceraları</h1>
-                <p class="game-subtitle">Efsanevi Bir Hikaye Başlıyor</p>
+            <div class="menu-header">
+                <div class="menu-logo">
+                    <div class="logo-icon">👑</div>
+                    <h1 class="menu-title">Mine'in Maceraları</h1>
+                    <p class="menu-subtitle">Efsanevi Bir Hikaye Başlıyor</p>
+                </div>
             </div>
             
-            <div class="menu-buttons">
-                <button class="menu-btn primary" onclick="gameManager.newGame()">
-                    <span class="btn-icon">🎮</span>
-                    <span class="btn-text">Yeni Oyun</span>
-                </button>
-                <button class="menu-btn secondary" onclick="gameManager.continueGame()">
-                    <span class="btn-icon">▶️</span>
-                    <span class="btn-text">Devam Et</span>
-                </button>
-                <button class="menu-btn secondary" onclick="gameManager.showSettings()">
-                    <span class="btn-icon">⚙️</span>
-                    <span class="btn-text">Ayarlar</span>
-                </button>
-                <button class="menu-btn secondary" onclick="gameManager.showCredits()">
-                    <span class="btn-icon">📜</span>
-                    <span class="btn-text">Krediler</span>
-                </button>
-            </div>
-
-            <div class="menu-footer">
-                <p class="version-text">v1.0.0 - Mine için Özel</p>
+            <div class="menu-content">
+                <div class="menu-buttons">
+                    <button class="menu-btn primary" id="new-game-btn">
+                        <span class="btn-icon">🎮</span>
+                        <span class="btn-text">Yeni Oyun</span>
+                        <span class="btn-glow"></span>
+                    </button>
+                    <button class="menu-btn secondary" id="continue-btn">
+                        <span class="btn-icon">▶️</span>
+                        <span class="btn-text">Devam Et</span>
+                    </button>
+                    <button class="menu-btn secondary" id="settings-btn">
+                        <span class="btn-icon">⚙️</span>
+                        <span class="btn-text">Ayarlar</span>
+                    </button>
+                    <button class="menu-btn secondary" id="credits-btn">
+                        <span class="btn-icon">📜</span>
+                        <span class="btn-text">Krediler</span>
+                    </button>
+                </div>
+                
+                <div class="menu-stats">
+                    <div class="stat-item">
+                        <span class="stat-icon">🏆</span>
+                        <span class="stat-label">En Yüksek Skor</span>
+                        <span class="stat-value" id="high-score">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-icon">⏱️</span>
+                        <span class="stat-label">Oyun Süresi</span>
+                        <span class="stat-value" id="play-time">0s</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Bölüm Seçimi -->
     <div id="chapter-select" class="screen">
+        <div class="chapter-background">
+            <div class="chapter-particles"></div>
+        </div>
         <div class="chapter-container">
             <div class="chapter-header">
-                <button class="back-btn" onclick="gameManager.showMainMenu()">← Ana Menü</button>
+                <button class="back-btn" id="back-to-menu">
+                    <span class="back-icon">←</span>
+                    <span class="back-text">Ana Menü</span>
+                </button>
                 <h2 class="chapter-title">Bölüm Seçimi</h2>
+                <div class="chapter-progress-info">
+                    <span id="chapters-completed">0/6</span>
+                </div>
             </div>
             
-            <div class="chapters-grid">
-                <div class="chapter-card unlocked" data-chapter="1" onclick="gameManager.selectChapter(1)">
-                    <div class="chapter-icon">🏰</div>
-                    <h3>Bölüm 1</h3>
-                    <p>Kristal Kale'nin Sırrı</p>
-                    <div class="chapter-progress">
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 0%"></div>
-                        </div>
-                        <span class="progress-text">0%</span>
-                    </div>
-                </div>
-                
-                <div class="chapter-card locked" data-chapter="2">
-                    <div class="chapter-icon">🌲</div>
-                    <h3>Bölüm 2</h3>
-                    <p>Gizemli Orman</p>
-                    <div class="lock-overlay">🔒</div>
-                </div>
-                
-                <div class="chapter-card locked" data-chapter="3">
-                    <div class="chapter-icon">🗝️</div>
-                    <h3>Bölüm 3</h3>
-                    <p>Kaybolmuş Anahtarlar</p>
-                    <div class="lock-overlay">🔒</div>
-                </div>
-                
-                <div class="chapter-card locked" data-chapter="4">
-                    <div class="chapter-icon">🐉</div>
-                    <h3>Bölüm 4</h3>
-                    <p>Ejderhanın Yolu</p>
-                    <div class="lock-overlay">🔒</div>
-                </div>
-                
-                <div class="chapter-card locked" data-chapter="5">
-                    <div class="chapter-icon">💎</div>
-                    <h3>Bölüm 5</h3>
-                    <p>Sihirli Kristaller</p>
-                    <div class="lock-overlay">🔒</div>
-                </div>
-                
-                <div class="chapter-card locked" data-chapter="6">
-                    <div class="chapter-icon">👑</div>
-                    <h3>Bölüm 6</h3>
-                    <p>Final: Taç Giyme</p>
-                    <div class="lock-overlay">🔒</div>
-                </div>
+            <div class="chapters-grid" id="chapters-grid">
+                <!-- Bölüm kartları JavaScript ile oluşturulacak -->
             </div>
         </div>
     </div>
 
     <!-- Oyun Ekranı -->
     <div id="game-screen" class="screen">
+        <div class="game-background">
+            <div class="game-particles"></div>
+        </div>
         <div class="game-ui">
             <!-- Üst Bar -->
             <div class="game-header">
                 <div class="header-left">
-                    <button class="back-btn" onclick="gameManager.showChapterSelect()">← Bölümler</button>
+                    <button class="header-btn" id="pause-btn">
+                        <span class="btn-icon">⏸️</span>
+                    </button>
                     <div class="chapter-info">
-                        <h3 id="current-chapter">Bölüm 1: Kristal Kale'nin Sırrı</h3>
+                        <h3 class="chapter-name" id="current-chapter-name">Bölüm 1: Kristal Kale'nin Sırrı</h3>
+                        <div class="scene-progress">
+                            <div class="progress-bar small">
+                                <div class="progress-fill" id="scene-progress-fill"></div>
+                            </div>
+                            <span class="progress-text" id="scene-progress-text">1/3</span>
+                        </div>
                     </div>
                 </div>
                 
                 <div class="header-center">
                     <div class="player-stats">
                         <div class="stat health">
-                            <span class="stat-icon">❤️</span>
+                            <div class="stat-icon">❤️</div>
+                            <div class="stat-bar">
+                                <div class="stat-fill health-fill" id="health-fill"></div>
+                            </div>
                             <span class="stat-value" id="health-value">100</span>
                         </div>
                         <div class="stat score">
-                            <span class="stat-icon">⭐</span>
+                            <div class="stat-icon">⭐</div>
                             <span class="stat-value" id="score-value">0</span>
                         </div>
                         <div class="stat crystals">
-                            <span class="stat-icon">💎</span>
+                            <div class="stat-icon">💎</div>
                             <span class="stat-value" id="crystals-value">0</span>
                         </div>
                     </div>
                 </div>
                 
                 <div class="header-right">
-                    <button class="control-btn" onclick="gameManager.toggleInventory()" title="Envanter">🎒</button>
-                    <button class="control-btn" onclick="gameManager.toggleMap()" title="Harita">🗺️</button>
-                    <button class="control-btn" onclick="gameManager.togglePause()" title="Duraklat">⏸️</button>
+                    <button class="header-btn" id="inventory-btn" title="Envanter">
+                        <span class="btn-icon">🎒</span>
+                    </button>
+                    <button class="header-btn" id="map-btn" title="Harita">
+                        <span class="btn-icon">🗺️</span>
+                    </button>
+                    <button class="header-btn" id="sound-btn" title="Ses">
+                        <span class="btn-icon">🔊</span>
+                    </button>
                 </div>
             </div>
 
             <!-- Oyun İçeriği -->
             <div class="game-content">
                 <div class="story-container">
-                    <div class="story-text" id="story-text">
-                        <h2 id="scene-title">Karşılama</h2>
-                        <p id="scene-description">Hikaye başlıyor...</p>
+                    <div class="story-scene" id="story-scene">
+                        <div class="scene-header">
+                            <h2 class="scene-title" id="scene-title">Sahne Başlığı</h2>
+                        </div>
+                        <div class="scene-content">
+                            <div class="scene-image" id="scene-image">
+                                <div class="image-placeholder">🏰</div>
+                            </div>
+                            <div class="scene-text">
+                                <p class="scene-description" id="scene-description">
+                                    Hikaye metni burada görünecek...
+                                </p>
+                            </div>
+                        </div>
                     </div>
                     
                     <div class="choices-container" id="choices-container">
-                        <!-- Seçenekler buraya gelecek -->
+                        <!-- Seçenekler JavaScript ile oluşturulacak -->
                     </div>
-                </div>
-                
-                <div class="game-area" id="game-area">
-                    <!-- Mini oyunlar burada gösterilecek -->
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Modals -->
     <!-- Envanter Modal -->
     <div id="inventory-modal" class="modal">
+        <div class="modal-overlay"></div>
         <div class="modal-content">
             <div class="modal-header">
-                <h2>🎒 Envanter</h2>
-                <button class="close-btn" onclick="gameManager.closeModal('inventory-modal')">×</button>
+                <h2 class="modal-title">🎒 Envanter</h2>
+                <button class="modal-close" id="close-inventory">×</button>
             </div>
             <div class="modal-body">
                 <div class="inventory-grid" id="inventory-grid">
-                    <!-- Envanter items buraya gelecek -->
+                    <!-- Envanter items JavaScript ile oluşturulacak -->
+                </div>
+                <div class="inventory-stats">
+                    <div class="inventory-stat">
+                        <span class="stat-label">Toplam Eşya:</span>
+                        <span class="stat-value" id="total-items">0</span>
+                    </div>
+                    <div class="inventory-stat">
+                        <span class="stat-label">Nadir Eşya:</span>
+                        <span class="stat-value" id="rare-items">0</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -187,14 +214,15 @@
 
     <!-- Harita Modal -->
     <div id="map-modal" class="modal">
+        <div class="modal-overlay"></div>
         <div class="modal-content">
             <div class="modal-header">
-                <h2>🗺️ Harita</h2>
-                <button class="close-btn" onclick="gameManager.closeModal('map-modal')">×</button>
+                <h2 class="modal-title">🗺️ Harita</h2>
+                <button class="modal-close" id="close-map">×</button>
             </div>
             <div class="modal-body">
                 <div class="map-container" id="map-container">
-                    <!-- Harita bölgeleri buraya gelecek -->
+                    <!-- Harita bölgeleri JavaScript ile oluşturulacak -->
                 </div>
             </div>
         </div>
@@ -202,17 +230,40 @@
 
     <!-- Duraklatma Modal -->
     <div id="pause-modal" class="modal">
+        <div class="modal-overlay"></div>
         <div class="modal-content">
             <div class="modal-header">
-                <h2>⏸️ Oyun Duraklatıldı</h2>
-                <button class="close-btn" onclick="gameManager.closeModal('pause-modal')">×</button>
+                <h2 class="modal-title">⏸️ Oyun Duraklatıldı</h2>
+                <button class="modal-close" id="close-pause">×</button>
             </div>
             <div class="modal-body">
-                <div class="pause-buttons">
-                    <button class="menu-btn primary" onclick="gameManager.resumeGame()">Devam Et</button>
-                    <button class="menu-btn secondary" onclick="gameManager.restartChapter()">Bölümü Yeniden Başlat</button>
-                    <button class="menu-btn secondary" onclick="gameManager.showMainMenu()">Ana Menü</button>
-                    <button class="menu-btn secondary" onclick="gameManager.saveGame()">Oyunu Kaydet</button>
+                <div class="pause-menu">
+                    <button class="pause-btn primary" id="resume-game">
+                        <span class="btn-icon">▶️</span>
+                        <span class="btn-text">Devam Et</span>
+                    </button>
+                    <button class="pause-btn secondary" id="restart-chapter">
+                        <span class="btn-icon">🔄</span>
+                        <span class="btn-text">Bölümü Yeniden Başlat</span>
+                    </button>
+                    <button class="pause-btn secondary" id="save-game">
+                        <span class="btn-icon">💾</span>
+                        <span class="btn-text">Oyunu Kaydet</span>
+                    </button>
+                    <button class="pause-btn secondary" id="main-menu">
+                        <span class="btn-icon">🏠</span>
+                        <span class="btn-text">Ana Menü</span>
+                    </button>
+                </div>
+                <div class="pause-stats">
+                    <div class="pause-stat">
+                        <span class="stat-label">Oyun Süresi:</span>
+                        <span class="stat-value" id="pause-play-time">00:00</span>
+                    </div>
+                    <div class="pause-stat">
+                        <span class="stat-label">Mevcut Bölüm:</span>
+                        <span class="stat-value" id="pause-chapter">Bölüm 1</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -220,63 +271,158 @@
 
     <!-- Ayarlar Modal -->
     <div id="settings-modal" class="modal">
+        <div class="modal-overlay"></div>
         <div class="modal-content">
             <div class="modal-header">
-                <h2>⚙️ Ayarlar</h2>
-                <button class="close-btn" onclick="gameManager.closeModal('settings-modal')">×</button>
+                <h2 class="modal-title">⚙️ Ayarlar</h2>
+                <button class="modal-close" id="close-settings">×</button>
             </div>
             <div class="modal-body">
-                <div class="settings-section">
-                    <h3>Ses Ayarları</h3>
-                    <div class="setting-item">
-                        <label for="music-volume">Müzik</label>
-                        <input type="range" id="music-volume" min="0" max="100" value="70">
-                        <span class="volume-value">70%</span>
+                <div class="settings-sections">
+                    <div class="settings-section">
+                        <h3 class="section-title">🎵 Ses Ayarları</h3>
+                        <div class="setting-item">
+                            <label class="setting-label">Müzik</label>
+                            <div class="setting-control">
+                                <input type="range" id="music-volume" min="0" max="100" value="70">
+                                <span class="setting-value" id="music-volume-value">70%</span>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <label class="setting-label">Efektler</label>
+                            <div class="setting-control">
+                                <input type="range" id="sfx-volume" min="0" max="100" value="80">
+                                <span class="setting-value" id="sfx-volume-value">80%</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="setting-item">
-                        <label for="sfx-volume">Efektler</label>
-                        <input type="range" id="sfx-volume" min="0" max="100" value="80">
-                        <span class="volume-value">80%</span>
+                    
+                    <div class="settings-section">
+                        <h3 class="section-title">🎮 Oyun Ayarları</h3>
+                        <div class="setting-item">
+                            <label class="setting-label">Metin Hızı</label>
+                            <div class="setting-control">
+                                <select id="text-speed">
+                                    <option value="slow">Yavaş</option>
+                                    <option value="normal" selected>Normal</option>
+                                    <option value="fast">Hızlı</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <label class="setting-label">Otomatik Kaydet</label>
+                            <div class="setting-control">
+                                <input type="checkbox" id="auto-save" checked>
+                                <span class="checkbox-label">Açık</span>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <label class="setting-label">Parçacık Efektleri</label>
+                            <div class="setting-control">
+                                <input type="checkbox" id="particle-effects" checked>
+                                <span class="checkbox-label">Açık</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-section">
+                        <h3 class="section-title">🎨 Görünüm</h3>
+                        <div class="setting-item">
+                            <label class="setting-label">Tema</label>
+                            <div class="setting-control">
+                                <select id="theme">
+                                    <option value="dark" selected>Koyu</option>
+                                    <option value="light">Açık</option>
+                                    <option value="auto">Otomatik</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="settings-section">
-                    <h3>Grafik Ayarları</h3>
-                    <div class="setting-item">
-                        <label for="particle-effects">Parçacık Efektleri</label>
-                        <input type="checkbox" id="particle-effects" checked>
-                    </div>
-                    <div class="setting-item">
-                        <label for="animations">Animasyonlar</label>
-                        <input type="checkbox" id="animations" checked>
-                    </div>
+                <div class="settings-actions">
+                    <button class="settings-btn primary" id="save-settings">
+                        <span class="btn-icon">💾</span>
+                        <span class="btn-text">Kaydet</span>
+                    </button>
+                    <button class="settings-btn secondary" id="reset-settings">
+                        <span class="btn-icon">🔄</span>
+                        <span class="btn-text">Sıfırla</span>
+                    </button>
                 </div>
-                
-                <div class="settings-section">
-                    <h3>Oyun Ayarları</h3>
-                    <div class="setting-item">
-                        <label for="text-speed">Metin Hızı</label>
-                        <select id="text-speed">
-                            <option value="slow">Yavaş</option>
-                            <option value="normal" selected>Normal</option>
-                            <option value="fast">Hızlı</option>
-                        </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Krediler Modal -->
+    <div id="credits-modal" class="modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">📜 Krediler</h2>
+                <button class="modal-close" id="close-credits">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="credits-content">
+                    <div class="credits-section">
+                        <h3 class="credits-title">🎮 Oyun Geliştiricileri</h3>
+                        <div class="credits-item">
+                            <span class="credits-role">Ana Geliştirici:</span>
+                            <span class="credits-name">Cascade AI</span>
+                        </div>
+                        <div class="credits-item">
+                            <span class="credits-role">Hikaye Yazarı:</span>
+                            <span class="credits-name">Cascade AI</span>
+                        </div>
+                        <div class="credits-item">
+                            <span class="credits-role">Tasarımcı:</span>
+                            <span class="credits-name">Cascade AI</span>
+                        </div>
                     </div>
-                    <div class="setting-item">
-                        <label for="auto-save">Otomatik Kaydet</label>
-                        <input type="checkbox" id="auto-save" checked>
+                    
+                    <div class="credits-section">
+                        <h3 class="credits-title">👑 Özel Teşekkür</h3>
+                        <div class="credits-item special">
+                            <span class="credits-name">Mine</span>
+                            <span class="credits-role">Bu oyun senin için! ❤️</span>
+                        </div>
+                    </div>
+                    
+                    <div class="credits-section">
+                        <h3 class="credits-title">🛠️ Teknolojiler</h3>
+                        <div class="credits-item">
+                            <span class="credits-role">Frontend:</span>
+                            <span class="credits-name">HTML5, CSS3, JavaScript</span>
+                        </div>
+                        <div class="credits-item">
+                            <span class="credits-role">Font:</span>
+                            <span class="credits-name">Inter (Google Fonts)</span>
+                        </div>
+                        <div class="credits-item">
+                            <span class="credits-role">İkonlar:</span>
+                            <span class="credits-name">Unicode Emojis</span>
+                        </div>
+                    </div>
+                    
+                    <div class="credits-footer">
+                        <p class="version-text">Mine'in Maceraları v1.0.0</p>
+                        <p class="copyright-text">© 2024 - Mine için özel olarak yapıldı</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Bildirimler -->
+    <div id="notification-container" class="notification-container"></div>
+
     <!-- JavaScript -->
-    <script src="static/js/game-engine.js"></script>
-    <script src="static/js/story-manager.js"></script>
+    <script src="static/js/utils.js"></script>
+    <script src="static/js/audio.js"></script>
+    <script src="static/js/save-system.js"></script>
+    <script src="static/js/story-data.js"></script>
     <script src="static/js/ui-manager.js"></script>
-    <script src="static/js/audio-manager.js"></script>
-    <script src="static/js/save-manager.js"></script>
+    <script src="static/js/game-engine.js"></script>
     <script src="static/js/main.js"></script>
 </body>
 </html>
