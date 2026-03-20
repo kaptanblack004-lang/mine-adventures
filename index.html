@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mine'in Maceraları - Interaktif Hikaye</title>
+    <link rel="stylesheet" href="static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Giriş Ekranı -->
+    <div id="intro-screen" class="screen active">
+        <div class="intro-content">
+            <h1 class="glow-text">✨ Mine'in Gizemli Dünyası ✨</h1>
+            <p class="subtitle">Büyülü bir macera seni bekliyor...</p>
+            <div class="character-intro">
+                <div class="character-avatar">👸</div>
+                <h2>Prenses Mine</h2>
+                <p>Kaybolmuş kristalleri bulmak için yola çıkan cesur prenses</p>
+            </div>
+            <button class="magic-btn" onclick="startAdventure()">
+                <span class="btn-text">Maceraya Başla 🚀</span>
+                <div class="btn-sparkle"></div>
+            </button>
+        </div>
+        <div class="floating-elements">
+            <div class="star">⭐</div>
+            <div class="star">✨</div>
+            <div class="star">🌟</div>
+            <div class="star">💫</div>
+        </div>
+    </div>
+
+    <!-- Bölüm Seçim Ekranı -->
+    <div id="chapter-select" class="screen">
+        <div class="chapter-content">
+            <h1>Bölümler</h1>
+            <div class="chapters-grid">
+                <div class="chapter-card" onclick="loadChapter(1)">
+                    <div class="chapter-icon">🏰</div>
+                    <h3>Bölüm 1</h3>
+                    <p>Kristal Kale'nin Sırrı</p>
+                    <div class="chapter-status locked">🔒 Kilitli</div>
+                </div>
+                <div class="chapter-card" onclick="loadChapter(2)">
+                    <div class="chapter-icon">🌙</div>
+                    <h3>Bölüm 2</h3>
+                    <p>Gizemli Orman</p>
+                    <div class="chapter-status locked">🔒 Kilitli</div>
+                </div>
+                <div class="chapter-card" onclick="loadChapter(3)">
+                    <div class="chapter-icon">🗝️</div>
+                    <h3>Bölüm 3</h3>
+                    <p>Kayıp Anahtarlar</p>
+                    <div class="chapter-status locked">🔒 Kilitli</div>
+                </div>
+                <div class="chapter-card" onclick="loadChapter(4)">
+                    <div class="chapter-icon">🐉</div>
+                    <h3>Bölüm 4</h3>
+                    <p>Ejderhanın Yolu</p>
+                    <div class="chapter-status locked">🔒 Kilitli</div>
+                </div>
+                <div class="chapter-card" onclick="loadChapter(5)">
+                    <div class="chapter-icon">💎</div>
+                    <h3>Bölüm 5</h3>
+                    <p>Sihirli Kristaller</p>
+                    <div class="chapter-status locked">🔒 Kilitli</div>
+                </div>
+                <div class="chapter-card" onclick="loadChapter(6)">
+                    <div class="chapter-icon">👑</div>
+                    <h3>Bölüm 6</h3>
+                    <p>Final: Taç Giyme</p>
+                    <div class="chapter-status locked">🔒 Kilitli</div>
+                </div>
+            </div>
+            <button class="back-btn" onclick="showScreen('intro-screen')">← Geri</button>
+        </div>
+    </div>
+
+    <!-- Oyun Ekranı -->
+    <div id="game-screen" class="screen">
+        <div class="game-header">
+            <div class="level-info">
+                <span id="current-chapter">Bölüm 1</span>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress"></div>
+                </div>
+            </div>
+            <div class="player-stats">
+                <div class="stat">
+                    <span class="stat-icon">❤️</span>
+                    <span id="health">100</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-icon">⭐</span>
+                    <span id="score">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-icon">💎</span>
+                    <span id="crystals">0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-content">
+            <div id="story-area" class="story-area">
+                <div class="story-text">
+                    <h2 id="story-title">Kristal Kale'nin Sırrı</h2>
+                    <p id="story-text">Hikaye burada başlayacak...</p>
+                </div>
+            </div>
+
+            <div id="game-area" class="game-area">
+                <!-- Oyun içeriği dinamik olarak yüklenecek -->
+            </div>
+
+            <div id="choices-area" class="choices-area">
+                <!-- Seçenekler dinamik olarak yüklenecek -->
+            </div>
+        </div>
+
+        <div class="game-controls">
+            <button class="control-btn" onclick="pauseGame()">⏸️ Duraklat</button>
+            <button class="control-btn" onclick="showInventory()">🎒 Çanta</button>
+            <button class="control-btn" onclick="showMap()">🗺️ Harita</button>
+            <button class="control-btn" onclick="showScreen('chapter-select')">📚 Bölümler</button>
+        </div>
+    </div>
+
+    <!-- Mini Oyunlar Ekranı -->
+    <div id="mini-game" class="screen">
+        <div class="mini-game-content">
+            <div id="mini-game-area">
+                <!-- Mini oyun içeriği -->
+            </div>
+            <button class="back-btn" onclick="closeMiniGame()">← Geri Dön</button>
+        </div>
+    </div>
+
+    <!-- Envanter Ekranı -->
+    <div id="inventory" class="modal">
+        <div class="modal-content">
+            <h2>Envanter 🎒</h2>
+            <div class="inventory-grid" id="inventory-grid">
+                <!-- Envanter items -->
+            </div>
+            <button class="close-btn" onclick="closeModal('inventory')">✕</button>
+        </div>
+    </div>
+
+    <!-- Harita Ekranı -->
+    <div id="map" class="modal">
+        <div class="modal-content">
+            <h2>Dünya Haritası 🗺️</h2>
+            <div class="map-container">
+                <div class="map-region" onclick="travelToRegion('kale')">
+                    <span class="region-icon">🏰</span>
+                    <span>Kristal Kale</span>
+                </div>
+                <div class="map-region locked" onclick="travelToRegion('orman')">
+                    <span class="region-icon">🌲</span>
+                    <span>Gizemli Orman</span>
+                </div>
+                <div class="map-region locked" onclick="travelToRegion('dag')">
+                    <span class="region-icon">⛰️</span>
+                    <span>Büyücü Dağ</span>
+                </div>
+                <div class="map-region locked" onclick="travelToRegion('gol')">
+                    <span class="region-icon">🌊</span>
+                    <span>Fısıltılı Göl</span>
+                </div>
+            </div>
+            <button class="close-btn" onclick="closeModal('map')">✕</button>
+        </div>
+    </div>
+
+    <!-- Ses Efektleri -->
+    <audio id="bg-music" loop>
+        <source src="static/sounds/background.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="click-sound">
+        <source src="static/sounds/click.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="success-sound">
+        <source src="static/sounds/success.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- JavaScript -->
+    <script src="static/js/game.js"></script>
+    <script src="static/js/story.js"></script>
+    <script src="static/js/mini-games.js"></script>
+    <script src="static/js/main.js"></script>
+</body>
+</html>
