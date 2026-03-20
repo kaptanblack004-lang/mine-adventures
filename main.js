@@ -253,32 +253,319 @@ class GameEngine {
             search_library: {
                 success: true,
                 points: 10,
-                message: "Kütüphanede eski bir harita buldun!",
+                message: "Kütüphanede eski bir harita buldun! +10 puan",
                 unlocksNextChapter: false,
-                nextChapter: null
+                nextChapter: null,
+                reward: "map_fragment"
             },
             visit_wizard: {
-                siuccess: true,
+                success: true,
                 points: 15,
-                message: "Büyücü sana sihirli bir gave verdi!",
+                message: "Büyücü sana sihirli bir gave verdi! +15 puan",
                 unlocksNextChapter: false,
-                nextChapter: null
+                nextChapter: null,
+                reward: "magic_potion"
             },
             explore_dungeon: {
                 success: true,
                 points: 20,
-                message: "Zindende ilk kristali buldun!",
+                message: "Zindende ilk kristali buldun! +20 puan, Bölüm 2 açıldı!",
                 unlocksNextChapter: true,
-                nextChapter: 2
+                nextChapter: 2,
+                reward: "crystal_fragment"
             },
-            // Diğer seçenekler...
+            open_door: {
+                success: true,
+                points: 25,
+                message: "Kapıyı açarken tuzağa rastladın ama kristal buldun! +25 puan",
+                damage: 5,
+                unlocksNextChapter: false,
+                nextChapter: null,
+                reward: "crystal_shard"
+            },
+            listen_door: {
+                success: true,
+                points: 18,
+                message: "Kapının arkasındaki sırrı öğrendin! +18 puan",
+                unlocksNextChapter: false,
+                nextChapter: null,
+                reward: "secret_knowledge"
+            },
+            continue_forward: {
+                success: true,
+                points: 12,
+                message: "Güvenli bir seçim yaptın! +12 puan",
+                unlocksNextChapter: false,
+                nextChapter: null,
+                reward: "safety_charm"
+            },
+            touch_orb: {
+                success: true,
+                points: 30,
+                message: "Küreden geleceğe dair görüntüler gördün! +30 puan",
+                unlocksNextChapter: false,
+                nextChapter: null,
+                reward: "vision_crystal"
+            },
+            ask_help: {
+                success: true,
+                points: 22,
+                message: "Büyücüden güçlü bir iksir aldın! +22 puan",
+                unlocksNextChapter: false,
+                nextChapter: null,
+                reward: "healing_potion"
+            },
+            go_alone: {
+                success: true,
+                points: 28,
+                message: "Cesaretin büyücüden bereket aldı! +28 puan",
+                unlocksNextChapter: false,
+                nextChapter: null,
+                reward: "courage_blessing"
+            },
+            light_path: {
+                success: true,
+                points: 35,
+                message: "Işık yolu seni parlak bir kristale götürdü! +35 puan",
+                unlocksNextChapter: false,
+                nextChapter: null,
+                reward: "light_crystal"
+            },
+            lake_path: {
+                success: true,
+                points: 40,
+                message: "Göl yolu tehlikeliydi ama ödüllendiriciydi! +40 puan",
+                damage: 8,
+                unlocksNextChapter: false,
+                nextChapter: null,
+                reward: "water_crystal"
+            },
+            dark_cave: {
+                success: true,
+                points: 45,
+                message: "Mağara korkutucuydu ama değerli bir şey buldun! +45 puan",
+                damage: 12,
+                unlocksNextChapter: false,
+                nextChapter: null,
+                reward: "shadow_crystal"
+            },
+            courage_trial: {
+                success: true,
+                points: 50,
+                message: "Cesaret denemesini geçtin! +50 puan",
+                damage: 15,
+                unlocksNextChapter: false,
+                nextChapter: null,
+                reward: "courage_gem"
+            },
+            wisdom_trial: {
+                success: true,
+                points: 45,
+                message: "Bilgelik denemesini kolaylıkla geçtin! +45 puan",
+                damage: 0,
+                unlocksNextChapter: false,
+                nextChapter: null,
+                reward: "wisdom_gem"
+            },
+            love_trial: {
+                success: true,
+                points: 48,
+                message: "Sevgi denemesi kalbini güçlendirdi! +48 puan",
+                damage: 0,
+                unlocksNextChapter: false,
+                nextChapter: null,
+                reward: "love_gem"
+            },
+            golden_key: {
+                success: true,
+                points: 38,
+                message: "Altın anahtar hazinenin kapısını açtı! +38 puan",
+                unlocksNextChapter: false,
+                nextChapter: null,
+                reward: "treasure_chest"
+            },
+            silver_key: {
+                success: true,
+                points: 42,
+                message: "Gümüş anahtar saflık kristalini ortaya çıkardı! +42 puan",
+                damage: 3,
+                unlocksNextChapter: false,
+                nextChapter: null,
+                reward: "purity_crystal"
+            },
+            bronze_key: {
+                success: true,
+                points: 35,
+                message: "Bronz anahtar eski bilgileri açığa çıkardı! +35 puan",
+                unlocksNextChapter: false,
+                nextChapter: null,
+                reward: "ancient_scroll"
+            },
+            befriend_dragon: {
+                success: true,
+                points: 60,
+                message: "Ejderha senin dostun oldu! +60 puan",
+                unlocksNextChapter: false,
+                nextChapter: null,
+                reward: "dragon_friendship"
+            },
+            fight_dragon: {
+                success: true,
+                points: 55,
+                message: "Ejderha ile savaşarak kristal kazandın! +55 puan",
+                damage: 20,
+                unlocksNextChapter: false,
+                nextChapter: null,
+                reward: "dragon_scale"
+            },
+            learn_secret: {
+                success: true,
+                points: 52,
+                message: "Ejderhanın sırrını öğrendin! +52 puan",
+                unlocksNextChapter: false,
+                nextChapter: null,
+                reward: "dragon_secret"
+            },
+            choose_courage: {
+                success: true,
+                points: 65,
+                message: "Cesaretin son kristali kazandırdı! +65 puan",
+                damage: 18,
+                unlocksNextChapter: false,
+                nextChapter: null,
+                reward: "final_crystal"
+            },
+            choose_wisdom: {
+                success: true,
+                points: 70,
+                message: "Bilgelikle kristalı kolayca kazandın! +70 puan",
+                damage: 0,
+                unlocksNextChapter: false,
+                nextChapter: null,
+                reward: "final_crystal"
+            },
+            choose_love: {
+                success: true,
+                points: 68,
+                message: "Sevgin kristalı sana hediye etti! +68 puan",
+                damage: 0,
+                unlocksNextChapter: false,
+                nextChapter: null,
+                reward: "final_crystal"
+            },
+            rule_justice: {
+                success: true,
+                points: 80,
+                message: "Adaletle yöneteceksin! +80 puan, oyun tamamlandı!",
+                damage: 0,
+                unlocksNextChapter: false,
+                nextChapter: null,
+                reward: "justice_crown"
+            },
+            rule_love: {
+                success: true,
+                points: 85,
+                message: "Sevgiyle yöneteceksin! +85 puan, oyun tamamlandı!",
+                damage: 0,
+                unlocksNextChapter: false,
+                nextChapter: null,
+                reward: "love_crown"
+            },
+            rule_wisdom: {
+                success: true,
+                points: 90,
+                message: "Bilgelikle yöneteceksin! +90 puan, oyun tamamlandı!",
+                damage: 0,
+                unlocksNextChapter: false,
+                nextChapter: null,
+                reward: "wisdom_crown"
+            }
         };
         
-        return choices[choiceAction] || {
-            success: false,
-            damage: 10,
-            message: "Bu seçim iyi değilmiş! Canın azaldı."
+        const result = choices[choiceAction] || {
+            success: true,
+            points: 5,
+            message: "Bu seçim ilginçti! +5 puan",
+            damage: 0,
+            unlocksNextChapter: false,
+            nextChapter: null,
+            reward: "small_gem"
         };
+        
+        // Ödülü envantere ekle
+        if (result.reward && result.success) {
+            this.playerData.inventory.push({
+                name: result.reward,
+                icon: this.getItemIcon(result.reward),
+                description: this.getItemDescription(result.reward)
+            });
+        }
+        
+        return result;
+    }
+
+    getItemIcon(itemName) {
+        const icons = {
+            map_fragment: "🗺️",
+            magic_potion: "🧪",
+            crystal_fragment: "💎",
+            crystal_shard: "💠",
+            secret_knowledge: "📜",
+            safety_charm: "🛡️",
+            vision_crystal: "🔮",
+            healing_potion: "💚",
+            courage_blessing: "✨",
+            light_crystal: "💡",
+            water_crystal: "💧",
+            shadow_crystal: "🌑",
+            courage_gem: "💪",
+            wisdom_gem: "🧠",
+            love_gem: "❤️",
+            treasure_chest: "📦",
+            purity_crystal: "🤍",
+            ancient_scroll: "📜",
+            dragon_friendship: "🐉",
+            dragon_scale: "🐲",
+            dragon_secret: "🤫",
+            final_crystal: "👑",
+            justice_crown: "⚖️",
+            love_crown: "👸",
+            wisdom_crown: "👑",
+            small_gem: "💎"
+        };
+        return icons[itemName] || "🎁";
+    }
+
+    getItemDescription(itemName) {
+        const descriptions = {
+            map_fragment: "Eski bir harita parçası",
+            magic_potion: "Büyücüden gelen sihirli iksir",
+            crystal_fragment: "Kristalin bir parçası",
+            crystal_shard: "Kristal kırıntısı",
+            secret_knowledge: "Gizli bilgi",
+            safety_charm: "Koruyucu tılsım",
+            vision_crystal: "Geleceği gösteren kristal",
+            healing_potion: "İyileştirici iksir",
+            courage_blessing: "Cesaret bereketi",
+            light_crystal: "Işık kristali",
+            water_crystal: "Su kristali",
+            shadow_crystal: "Gölge kristali",
+            courage_gem: "Cesaret taşı",
+            wisdom_gem: "Bilgelik taşı",
+            love_gem: "Sevgi taşı",
+            treasure_chest: "Define sandığı",
+            purity_crystal: "Saflık kristali",
+            ancient_scroll: "Eski parşömen",
+            dragon_friendship: "Ejderha dostluğu",
+            dragon_scale: "Ejderha pulu",
+            dragon_secret: "Ejderhanın sırrı",
+            final_crystal: "Son kristal",
+            justice_crown: "Adalet tacı",
+            love_crown: "Sevgi tacı",
+            wisdom_crown: "Bilgelik tacı",
+            small_gem: "Küçük kristal"
+        };
+        return descriptions[itemName] || "Gizemli eşya";
     }
 
     startMiniGame(gameType) {
