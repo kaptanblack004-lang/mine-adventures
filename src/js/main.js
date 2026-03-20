@@ -63,6 +63,9 @@ class WordBattleApp {
         // Oyun motorunu başlat
         this.game = new WordBattleGame();
         
+        // AI sistemini başlat
+        this.aiMode = new AIGameMode(this.game);
+        
         // UI yöneticisini başlat
         this.ui = new UIManager(this.game);
         
@@ -72,6 +75,7 @@ class WordBattleApp {
         // Sistemleri birbirine bağla
         this.game.ui = this.ui;
         this.game.network = this.network;
+        this.game.aiMode = this.aiMode;
         
         // Kullanıcı verilerini yükle
         this.loadUserData();
