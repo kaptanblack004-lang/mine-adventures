@@ -1,0 +1,910 @@
+// Efsanevi Mini Oyunlar - Ana Uygulama
+// Menü yönetimi, ayarlar ve genel kontrol
+
+// Sayfa yüklendiğinde başlat
+document.addEventListener('DOMContentLoaded', function() {
+    initializeApp();
+    loadHighScores();
+    initParticles();
+});
+
+// Uygulama başlatma
+function initializeApp() {
+    // İlk ekranı göster
+    showMenu();
+
+    // Klavye kontrolleri
+    document.addEventListener('keydown', handleKeyPress);
+
+    // Ekran geçiş animasyonları
+    initScreenTransitions();
+}
+
+// Ekran yönetimi
+function showMenu() {
+    hideAllScreens();
+    document.getElementById('menu').classList.add('active');
+    document.getElementById('game-title').textContent = '';
+    updateUI();
+}
+
+function showHighScores() {
+    hideAllScreens();
+    document.getElementById('high-scores').classList.add('active');
+    displayHighScores();
+}
+
+function showSettings() {
+    hideAllScreens();
+    document.getElementById('settings').classList.add('active');
+}
+
+function showMultiplayer() {
+    hideAllScreens();
+    document.getElementById('multiplayer').classList.add('active');
+    initMultiplayer();
+}
+
+function showGameScreen(gameType) {
+    hideAllScreens();
+    document.getElementById('game-screen').classList.add('active');
+
+    // Oyun başlığını ayarla
+    const gameTitles = {
+        xox: 'XOX',
+        snake: 'Yılan',
+        tetris: 'Tetris',
+        memory: 'Hafıza',
+        pong: 'Pong',
+        space: 'Uzay Savunması'
+    };
+
+    document.getElementById('game-title').textContent = gameTitles[gameType] || 'Oyun';
+}
+
+function hideAllScreens() {
+    document.querySelectorAll('.screen').forEach(screen => {
+        screen.classList.remove('active');
+    });
+}
+
+// Oyun başlatma
+function startGame(gameType) {
+    showGameScreen(gameType);
+    gameManager.startGame(gameType);
+    audioManager.playClick();
+}
+
+// Oyun kontrolleri
+function pauseGame() {
+    gameManager.pauseGame();
+    const pauseBtn = document.getElementById('pause-btn');
+    pauseBtn.textContent = gameManager.currentGame?.paused ? '▶️ Devam Et' : '⏸️ Duraklat';
+    audioManager.playClick();
+}
+
+function restartGame() {
+    gameManager.restartGame();
+    audioManager.playSuccess();
+}
+
+function quitGame() {
+    gameManager.quitGame();
+    audioManager.playClick();
+}
+
+// UI güncelleme
+function updateUI() {
+    if (gameManager.currentGame) {
+        document.getElementById('score').textContent = `Skor: ${gameManager.currentGame.score}`;
+        document.getElementById('level').textContent = `Seviye: ${gameManager.currentGame.level}`;
+        document.getElementById('lives').textContent = `Can: ${gameManager.currentGame.lives}`;
+    } else {
+        document.getElementById('score').textContent = 'Skor: 0';
+        document.getElementById('level').textContent = 'Seviye: 1';
+        document.getElementById('lives').textContent = 'Can: 3';
+    }
+}
+
+// Klavye kontrolleri
+function handleKeyPress(e) {
+    switch (e.key) {
+        case 'Escape':
+            if (document.getElementById('game-screen').classList.contains('active')) {
+                quitGame();
+            } else if (document.getElementById('settings').classList.contains('active') ||
+                       document.getElementById('high-scores').classList.contains('active')) {
+                showMenu();
+            }
+            break;
+        case ' ':
+            e.preventDefault(); // Space tuşunun sayfayı kaydırmasını engelle
+            break;
+    }
+}
+
+// Ekran geçiş animasyonları
+function initScreenTransitions() {
+    const screens = document.querySelectorAll('.screen');
+
+    screens.forEach(screen => {
+        screen.addEventListener('transitionend', () => {
+            // Geçiş tamamlandığında gerekli işlemleri yap
+        });
+    });
+}
+
+// Yüksek skor sistemi
+let highScores = JSON.parse(localStorage.getItem('highScores')) || {
+    xox: [],
+    snake: [],
+    tetris: [],
+    memory: [],
+    pong: [],
+    space: []
+};
+
+function saveHighScore(gameType, score, playerName = 'Oyuncu') {
+    if (!highScores[gameType]) {
+        highScores[gameType] = [];
+    }
+
+    highScores[gameType].push({
+        name: playerName,
+        score: score,
+        date: new Date().toLocaleDateString('tr-TR')
+    });
+
+    // Skorları sırala ve en iyi 10'u tut
+    highScores[gameType].sort((a, b) => b.score - a.score);
+    highScores[gameType] = highScores[gameType].slice(0, 10);
+
+    localStorage.setItem('highScores', JSON.stringify(highScores));
+    loadHighScores();
+}
+
+function loadHighScores() {
+    highScores = JSON.parse(localStorage.getItem('highScores')) || {
+        xox: [],
+        snake: [],
+        tetris: [],
+        memory: [],
+        pong: [],
+        space: []
+    };
+}
+
+function displayHighScores() {
+    const scoresList = document.getElementById('scores-list');
+    scoresList.innerHTML = '';
+
+    const gameTypes = Object.keys(highScores);
+    let allScores = [];
+
+    // Tüm oyunların skorlarını birleştir
+    gameTypes.forEach(gameType => {
+        highScores[gameType].forEach((score, index) => {
+            allScores.push({
+                game: gameType,
+                ...score,
+                globalRank: allScores.length + 1
+            });
+        });
+    });
+
+    // Global sıralamaya göre sırala
+    allScores.sort((a, b) => b.score - a.score);
+    allScores = allScores.slice(0, 20); // En iyi 20 skoru göster
+
+    if (allScores.length === 0) {
+        scoresList.innerHTML = '<p style="text-align: center; color: rgba(255,255,255,0.7);">Henüz hiç skor kaydedilmemiş!</p>';
+        return;
+    }
+
+    allScores.forEach((score, index) => {
+        const scoreItem = document.createElement('div');
+        scoreItem.className = 'score-item';
+
+        const gameNames = {
+            xox: 'XOX',
+            snake: 'Yılan',
+            tetris: 'Tetris',
+            memory: 'Hafıza',
+            pong: 'Pong',
+            space: 'Uzay Savunması'
+        };
+
+        scoreItem.innerHTML = `
+            <span class="rank">${index + 1}.</span>
+            <span class="name">${score.name} (${gameNames[score.game] || score.game})</span>
+            <span class="score">${score.score}</span>
+        `;
+
+        scoresList.appendChild(scoreItem);
+    });
+}
+
+// Oyun bitişinde skor kaydetme
+function handleGameOver(gameType, finalScore) {
+    if (finalScore > 0) {
+        const playerName = prompt('Skorunuzu kaydedin! Adınız:', 'Oyuncu') || 'Oyuncu';
+        saveHighScore(gameType, finalScore, playerName);
+        audioManager.playSuccess();
+    }
+}
+
+// Parçacık sistemi (arka plan efekti)
+function initParticles() {
+    const canvas = document.getElementById('particles-bg');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    const particles = [];
+    const particleCount = 50;
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    // Parçacıkları oluştur
+    for (let i = 0; i < particleCount; i++) {
+        particles.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            vx: (Math.random() - 0.5) * 0.5,
+            vy: (Math.random() - 0.5) * 0.5,
+            size: Math.random() * 2 + 1,
+            opacity: Math.random() * 0.5 + 0.2,
+            color: `hsl(${Math.random() * 60 + 180}, 70%, 60%)` // Mavi-mor tonları
+        });
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        particles.forEach(particle => {
+            particle.x += particle.vx;
+            particle.y += particle.vy;
+
+            // Ekran kenarlarında geri dön
+            if (particle.x < 0) particle.x = canvas.width;
+            if (particle.x > canvas.width) particle.x = 0;
+            if (particle.y < 0) particle.y = canvas.height;
+            if (particle.y > canvas.height) particle.y = 0;
+
+            // Çiz
+            ctx.beginPath();
+            ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+            ctx.fillStyle = particle.color;
+            ctx.globalAlpha = particle.opacity;
+            ctx.fill();
+        });
+
+        ctx.globalAlpha = 1;
+        requestAnimationFrame(animate);
+    }
+
+    animate();
+}
+
+// Hata yakalama
+window.addEventListener('error', function(e) {
+    console.error('Uygulama hatası:', e.error);
+    // Kullanıcı dostu hata mesajı gösterilebilir
+});
+
+// Performans optimizasyonu
+function optimizePerformance() {
+    // Gereksiz animasyonları durdur
+    let animationId = null;
+
+    function checkVisibility() {
+        if (document.hidden) {
+            // Sayfa görünür değilse animasyonları durdur
+            if (gameManager.currentGame) {
+                gameManager.currentGame.pause();
+            }
+        } else {
+            // Sayfa tekrar görünür olduğunda devam et
+            if (gameManager.currentGame && gameManager.currentGame.paused) {
+                gameManager.currentGame.pause();
+            }
+        }
+    }
+
+    document.addEventListener('visibilitychange', checkVisibility);
+}
+
+// Multiplayer sistemi
+let websocket = null;
+let currentRoom = null;
+let playerId = null;
+
+function initMultiplayer() {
+    connectWebSocket();
+    updateConnectionStatus();
+}
+
+function connectWebSocket() {
+    if (websocket && websocket.readyState === WebSocket.OPEN) {
+        return;
+    }
+
+    websocket = new WebSocket('ws://localhost:8765');
+
+    websocket.onopen = function(event) {
+        console.log('WebSocket bağlantısı açıldı');
+        updateConnectionStatus(true);
+    };
+
+    websocket.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        handleWebSocketMessage(data);
+    };
+
+    websocket.onclose = function(event) {
+        console.log('WebSocket bağlantısı kapandı');
+        updateConnectionStatus(false);
+        currentRoom = null;
+    };
+
+    websocket.onerror = function(error) {
+        console.error('WebSocket hatası:', error);
+        updateConnectionStatus(false);
+    };
+}
+
+function updateConnectionStatus(connected = null) {
+    const statusElement = document.getElementById('connection-status');
+    if (connected === null) {
+        connected = websocket && websocket.readyState === WebSocket.OPEN;
+    }
+
+    if (connected) {
+        statusElement.textContent = '🟢 Bağlandı';
+        statusElement.className = 'connected';
+    } else {
+        statusElement.textContent = '🔴 Bağlı Değil';
+        statusElement.className = 'disconnected';
+    }
+}
+
+function handleWebSocketMessage(data) {
+    switch (data.type) {
+        case 'player_joined':
+            updateRoomInfo(data);
+            addChatMessage(`${data.playerId} odaya katıldı`, 'system');
+            break;
+        case 'player_left':
+            updateRoomInfo(data);
+            addChatMessage(`${data.playerId} odadan ayrıldı`, 'system');
+            break;
+        case 'chat_message':
+            addChatMessage(`${data.playerId}: ${data.message}`, 'user');
+            break;
+        case 'game_move':
+            handleGameMove(data);
+            break;
+    }
+}
+
+function joinRoom(roomId) {
+    if (!websocket || websocket.readyState !== WebSocket.OPEN) {
+        alert('WebSocket bağlantısı yok!');
+        return;
+    }
+
+    currentRoom = roomId;
+    playerId = 'player_' + Math.random().toString(36).substr(2, 9);
+
+    const joinMessage = {
+        type: 'join_room',
+        roomId: roomId,
+        playerId: playerId
+    };
+
+    websocket.send(JSON.stringify(joinMessage));
+
+    // Oda butonlarını güncelle
+    document.querySelectorAll('.join-room-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.querySelector(`[data-room="${roomId}"]`).classList.add('active');
+
+    updateRoomInfo({ players: [playerId] });
+}
+
+function leaveRoom() {
+    if (currentRoom && websocket) {
+        websocket.send(JSON.stringify({
+            type: 'leave_room',
+            roomId: currentRoom,
+            playerId: playerId
+        }));
+        currentRoom = null;
+        playerId = null;
+        document.querySelectorAll('.join-room-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        document.getElementById('room-info').innerHTML = '';
+    }
+}
+
+function updateRoomInfo(data) {
+    const roomInfo = document.getElementById('room-info');
+    const players = data.players || [];
+    roomInfo.innerHTML = `<p>Oda: ${currentRoom}</p><p>Oyuncular: ${players.length}</p>`;
+}
+
+function sendChatMessage() {
+    const input = document.getElementById('chat-input');
+    const message = input.value.trim();
+    if (message && websocket && currentRoom) {
+        const chatData = {
+            type: 'chat_message',
+            playerId: playerId,
+            message: message,
+            timestamp: Date.now()
+        };
+        websocket.send(JSON.stringify(chatData));
+        addChatMessage(`Sen: ${message}`, 'self');
+        input.value = '';
+    }
+}
+
+function addChatMessage(message, type) {
+    const chatMessages = document.getElementById('chat-messages');
+    const messageElement = document.createElement('div');
+    messageElement.className = `chat-message ${type}`;
+    messageElement.textContent = message;
+    chatMessages.appendChild(messageElement);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+// Enter tuşu ile mesaj gönder
+document.addEventListener('DOMContentLoaded', function() {
+    const chatInput = document.getElementById('chat-input');
+    if (chatInput) {
+        chatInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendChatMessage();
+            }
+        });
+    }
+});
+
+// Multiplayer XOX
+let xoxBoard = ['', '', '', '', '', '', '', '', ''];
+let currentPlayer = 'X';
+let isMyTurn = true;
+
+function startMultiplayerXOX() {
+    if (!currentRoom) {
+        alert('Önce bir odaya katılın!');
+        return;
+    }
+
+    xoxBoard = ['', '', '', '', '', '', '', '', ''];
+    currentPlayer = 'X';
+    isMyTurn = Math.random() < 0.5; // Rastgele kim başlar
+
+    renderXOXBoard();
+    document.getElementById('multiplayer-xox').querySelector('.game-status').textContent =
+        isMyTurn ? 'Sıra sende!' : 'Rakip sırası';
+}
+
+function renderXOXBoard() {
+    const boardElement = document.getElementById('multiplayer-xox-board');
+    boardElement.innerHTML = '';
+
+    for (let i = 0; i < 9; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'xox-cell';
+        cell.textContent = xoxBoard[i];
+        cell.onclick = () => makeXOXMove(i);
+        boardElement.appendChild(cell);
+    }
+}
+
+function makeXOXMove(index) {
+    if (!isMyTurn || xoxBoard[index] !== '' || !websocket) return;
+
+    xoxBoard[index] = currentPlayer;
+    renderXOXBoard();
+
+    // Hamleyi gönder
+    websocket.send(JSON.stringify({
+        type: 'game_move',
+        playerId: playerId,
+        gameType: 'xox',
+        move: { index: index, player: currentPlayer }
+    }));
+
+    isMyTurn = false;
+    checkXOXWinner();
+    document.getElementById('multiplayer-xox').querySelector('.game-status').textContent = 'Rakip sırası';
+}
+
+function handleGameMove(data) {
+    if (data.gameType === 'xox') {
+        xoxBoard[data.move.index] = data.move.player;
+        renderXOXBoard();
+        isMyTurn = true;
+        checkXOXWinner();
+        document.getElementById('multiplayer-xox').querySelector('.game-status').textContent = 'Sıra sende!';
+    }
+}
+
+function checkXOXWinner() {
+    const winPatterns = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8], // Satırlar
+        [0, 3, 6], [1, 4, 7], [2, 5, 8], // Sütunlar
+        [0, 4, 8], [2, 4, 6] // Çaprazlar
+    ];
+
+    for (const pattern of winPatterns) {
+        const [a, b, c] = pattern;
+        if (xoxBoard[a] && xoxBoard[a] === xoxBoard[b] && xoxBoard[a] === xoxBoard[c]) {
+            document.getElementById('multiplayer-xox').querySelector('.game-status').textContent =
+                `${xoxBoard[a]} kazandı!`;
+            isMyTurn = false;
+            return;
+        }
+    }
+
+    if (xoxBoard.every(cell => cell !== '')) {
+        document.getElementById('multiplayer-xox').querySelector('.game-status').textContent = 'Berabere!';
+        isMyTurn = false;
+    }
+}
+
+optimizePerformance();
+
+// Konsol mesajı
+console.log('🎮 Efsanevi Mini Oyunlar başlatıldı!');
+console.log('Oyunlar: XOX, Yılan, Hafıza, Pong, Uzay Savunması');
+console.log('Profesyonel özellikler: Ses efektleri, yüksek skorlar, parçacık efektleri');
+
+// ===== MULTIPLAYER FONKSİYONLARI =====
+
+// WebSocket bağlantısı
+let ws = null;
+let isConnected = false;
+let playerId = null;
+let currentRoom = null;
+
+// WebSocket bağlantısını başlat
+function initWebSocket() {
+    // Yeni portları kullan
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const host = window.location.hostname;
+    const wsPort = window.location.port === '8001' ? '8766' : '8766';
+    const wsUrl = `${protocol}//${host}:${wsPort}/ws`;
+    
+    console.log('WebSocket URL:', wsUrl);
+
+    try {
+        ws = new WebSocket(wsUrl);
+        
+        // Oyuncu ID'si oluştur
+        playerId = 'player_' + Math.random().toString(36).substr(2, 9);
+
+        ws.onopen = function(event) {
+            console.log('WebSocket bağlantısı açıldı');
+            isConnected = true;
+            updateConnectionStatus(true);
+            showNotification('Sunucuya bağlandınız!', 'success');
+        };
+
+        ws.onmessage = function(event) {
+            try {
+                const data = JSON.parse(event.data);
+                handleWebSocketMessage(data);
+            } catch (e) {
+                console.error('WebSocket mesajı parse edilemedi:', e);
+            }
+        };
+
+        ws.onclose = function(event) {
+            console.log('WebSocket bağlantısı kapandı');
+            isConnected = false;
+            updateConnectionStatus(false);
+            showNotification('Sunucu bağlantısı kesildi!', 'error');
+            
+            // Otomatik yeniden bağlanma
+            setTimeout(() => {
+                if (!isConnected) {
+                    console.log('Yeniden bağlanma deneniyor...');
+                    initWebSocket();
+                }
+            }, 3000);
+        };
+
+        ws.onerror = function(error) {
+            console.error('WebSocket hatası:', error);
+            isConnected = false;
+            updateConnectionStatus(false);
+            showNotification('Bağlantı hatası!', 'error');
+        };
+    } catch (e) {
+        console.error('WebSocket oluşturma hatası:', e);
+        showNotification('WebSocket bağlantısı kurulamadı!', 'error');
+    }
+}
+
+// Bağlantı durumunu güncelle
+function updateConnectionStatus(connected) {
+    const statusElement = document.getElementById('connection-status');
+    if (statusElement) {
+        statusElement.className = connected ? 'connected' : 'disconnected';
+        statusElement.textContent = connected ? '🟢 Bağlı' : '🔴 Bağlı Değil';
+    }
+}
+
+// WebSocket mesajlarını işle
+function handleWebSocketMessage(data) {
+    console.log('Mesaj alındı:', data);
+    
+    switch (data.type) {
+        case 'player_joined':
+            if (data.roomId === currentRoom) {
+                showNotification(`${data.player.name} odaya katıldı`, 'info');
+                updateRoomInfo(data.players);
+                updateGameState(data.gameState);
+            }
+            break;
+
+        case 'player_left':
+            if (data.roomId === currentRoom) {
+                showNotification(`${data.player.name} odadan ayrıldı`, 'info');
+                updateRoomInfo(data.players);
+                updateGameState(data.gameState);
+            }
+            break;
+
+        case 'chat_message':
+            addChatMessage(data.player.name, data.message, data.timestamp);
+            break;
+
+        case 'game_move':
+            handleGameMove(data);
+            break;
+
+        case 'game_started':
+            startMultiplayerGame(data);
+            break;
+
+        case 'player_ready_update':
+            updateRoomInfo(data.players);
+            if (data.allReady) {
+                showNotification('Tüm oyuncular hazır! Oyun başlıyor...', 'success');
+            }
+            break;
+
+        case 'error':
+            showNotification(data.message, 'error');
+            break;
+
+        default:
+            console.log('Bilinmeyen mesaj tipi:', data.type);
+    }
+}
+            updateRoomInfo([]);
+            break;
+
+        case 'chat_message':
+            addChatMessage(data.playerId, data.message, data.timestamp);
+            break;
+
+        case 'game_move':
+            handleGameMove(data);
+            break;
+
+        case 'game_start':
+            startMultiplayerGame(data);
+            break;
+}
+
+// Chat mesajı ekle
+function addChatMessage(playerName, message, timestamp) {
+    const chatMessages = document.getElementById('chat-messages');
+    if (!chatMessages) return;
+
+    const messageElement = document.createElement('div');
+    messageElement.className = 'chat-message';
+    messageElement.innerHTML = `
+        <span class="player-name">${playerName}:</span>
+        <span class="message-text">${message}</span>
+        <span class="timestamp">${new Date(timestamp).toLocaleTimeString()}</span>
+    `;
+
+    chatMessages.appendChild(messageElement);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+// Odaya katıl
+function joinRoom(roomId) {
+    if (!isConnected) {
+        showNotification('Önce sunucuya bağlanın!', 'error');
+        return;
+    }
+
+    const playerName = prompt('Oyuncu adınız:') || 'Oyuncu';
+    
+    const data = {
+        type: 'join_room',
+        roomId: roomId,
+        playerId: playerId,
+        playerName: playerName
+    };
+
+    currentRoom = roomId;
+    ws.send(JSON.stringify(data));
+    showNotification(`${roomId} odasına katılınıyor...`, 'info');
+}
+
+// Odadan ayrıl
+function leaveRoom() {
+    if (!isConnected || !currentRoom) return;
+
+    const data = {
+        type: 'leave_room'
+    };
+
+    ws.send(JSON.stringify(data));
+}
+
+// Multiplayer XOX oyununu başlat
+function startMultiplayerXOX() {
+    if (!currentRoom) {
+        showNotification('Önce bir odaya katılın!', 'error');
+        return;
+    }
+
+    const data = {
+        type: 'start_game',
+        gameType: 'xox'
+    };
+
+    ws.send(JSON.stringify(data));
+}
+
+// Oda bilgisini güncelle
+function updateRoomInfo(players) {
+    const playersList = document.getElementById('players-list');
+    if (!playersList) return;
+    
+    playersList.innerHTML = '';
+    players.forEach(player => {
+        const playerElement = document.createElement('div');
+        playerElement.className = 'player-item';
+        playerElement.innerHTML = `
+            <span class="player-name">${player.name}</span>
+            <span class="player-status ${player.ready ? 'ready' : 'not-ready'}">
+                ${player.ready ? '✅ Hazır' : '⏳ Hazır Değil'}
+            </span>
+        `;
+        playersList.appendChild(playerElement);
+    });
+}
+
+// Oyun durumunu güncelle
+function updateGameState(gameState) {
+    if (!gameState) return;
+    
+    // XOX tahtasını güncelle
+    if (gameState.game === 'xox' && gameState.board) {
+        updateXOXBoardFromServer(gameState.board);
+    }
+    
+    // Sıra bilgisini güncelle
+    if (gameState.current_turn === playerId) {
+        isMyTurn = true;
+        showNotification('Sıra sende!', 'info');
+    } else {
+        isMyTurn = false;
+    }
+}
+
+// Sunucudan gelen XOX tahtasını güncelle
+function updateXOXBoardFromServer(board) {
+    const cells = document.querySelectorAll('#multiplayer-xox .cell');
+    cells.forEach((cell, index) => {
+        const row = Math.floor(index / 3);
+        const col = index % 3;
+        cell.textContent = board[row][col];
+        cell.className = 'cell ' + (board[row][col] ? 'taken' : '');
+    });
+}
+
+// Oyun hamlesini işle
+function handleGameMove(data) {
+    if (data.gameType === 'xox') {
+        updateXOXBoardFromServer(data.move);
+        
+        // Sıra kontrolü
+        if (data.player.id !== playerId) {
+            isMyTurn = true;
+            showNotification('Sıra sende!', 'info');
+        }
+    }
+}
+
+// Multiplayer oyun başlat
+function startMultiplayerGame(data) {
+    showNotification(`${data.gameType.toUpperCase()} oyunu başladı!`, 'success');
+
+    if (data.gameType === 'xox') {
+        initMultiplayerXOX();
+        updateGameState(data.gameState);
+    }
+}
+        const cell = document.createElement('div');
+        cell.className = 'xox-cell';
+        cell.dataset.position = i;
+        cell.onclick = () => sendXOXMove(i);
+        board.appendChild(cell);
+    }
+}
+
+// XOX tahtasını güncelle
+function updateXOXBoard(position, playerId) {
+    const cell = document.querySelector(`.xox-cell[data-position="${position}"]`);
+    if (cell && !cell.textContent) {
+        cell.textContent = playerId === playerId ? 'X' : 'O';
+        cell.classList.add('filled');
+    }
+}
+
+// Multiplayer oyunu sıfırla
+function resetMultiplayerGame(gameType) {
+    if (gameType === 'xox') {
+        const board = document.getElementById('multiplayer-xox-board');
+        if (board) {
+            board.innerHTML = '';
+        }
+    }
+}
+
+// Bildirim göster
+function showNotification(message, type = 'info') {
+    // Basit bildirim sistemi - daha sonra geliştirilebilir
+    console.log(`[${type.toUpperCase()}] ${message}`);
+
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+
+// Sayfa yüklendiğinde WebSocket'i başlat
+document.addEventListener('DOMContentLoaded', function() {
+    initWebSocket();
+
+    // Chat enter tuşu
+    const chatInput = document.getElementById('chat-input');
+    if (chatInput) {
+        chatInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendChatMessage();
+            }
+        });
+    }
+
+    // Oda katılma butonları
+    document.querySelectorAll('.join-room-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const roomId = this.dataset.room;
+            joinRoom(roomId);
+        });
+    });
+});

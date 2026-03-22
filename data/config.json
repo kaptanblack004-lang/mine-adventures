@@ -1,0 +1,75 @@
+{
+    "server": {
+        "host": "0.0.0.0",
+        "port": 8001,
+        "websocket_port": 8766,
+        "auto_start": true,
+        "log_level": "INFO",
+        "max_connections": 100,
+        "timeout": 30
+    },
+    "app": {
+        "name": "Efsanevi Mini Oyunlar",
+        "version": "1.0.0",
+        "theme": "dark",
+        "language": "tr",
+        "debug": false
+    },
+    "games": {
+        "default_lives": 3,
+        "score_multiplier": 1.0,
+        "time_limit": 300,
+        "auto_save": true,
+        "save_interval": 30
+    },
+    "audio": {
+        "master_volume": 0.5,
+        "sound_enabled": true,
+        "music_enabled": false,
+        "sound_effects": {
+            "click": true,
+            "success": true,
+            "fail": true,
+            "game_over": true,
+            "level_up": true
+        }
+    },
+    "ui": {
+        "animations": true,
+        "particles": true,
+        "fullscreen": false,
+        "show_fps": false,
+        "responsive": true
+    },
+    "performance": {
+        "max_fps": 60,
+        "vsync": true,
+        "power_saving": false,
+        "preload_assets": true
+    },
+    "security": {
+        "csp_enabled": true,
+        "input_validation": true,
+        "rate_limiting": true,
+        "cors_enabled": false
+    },
+    "backup": {
+        "auto_backup": true,
+        "backup_interval": 3600,
+        "max_backups": 10,
+        "backup_path": "./backups/"
+    },
+    "analytics": {
+        "enabled": false,
+        "track_games": true,
+        "track_scores": true,
+        "anonymous": true
+    },
+    "multiplayer": {
+        "max_players_per_room": 4,
+        "rooms": ["Room1", "Room2", "Room3"],
+        "chat_enabled": true,
+        "game_timeout": 300,
+        "websocket_path": "/ws"
+    }
+}

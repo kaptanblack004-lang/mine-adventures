@@ -1,0 +1,136 @@
+{
+    "app": {
+        "name": "Efsanevi Mini Oyunlar",
+        "version": "1.0.0",
+        "author": "Burak",
+        "description": "Profesyonel mini oyunlar koleksiyonu",
+        "year": 2026
+    },
+    "games": {
+        "xox": {
+            "name": "XOX",
+            "description": "Klasik üçleme oyunu",
+            "difficulty": "Kolay",
+            "maxScore": 1000,
+            "controls": "Fare ile tıkla"
+        },
+        "snake": {
+            "name": "Yılan",
+            "description": "Yılanı büyüt, puan topla",
+            "difficulty": "Orta",
+            "maxScore": 5000,
+            "controls": "WASD veya yön tuşları"
+        },
+        "tetris": {
+            "name": "Tetris",
+            "description": "Küp yerleştirme oyunu",
+            "difficulty": "Zor",
+            "maxScore": 10000,
+            "controls": "Yön tuşları, space"
+        },
+        "memory": {
+            "name": "Hafıza",
+            "description": "Eşleştirme oyunu",
+            "difficulty": "Kolay",
+            "maxScore": 2000,
+            "controls": "Fare ile tıkla"
+        },
+        "pong": {
+            "name": "Pong",
+            "description": "Klasik raket oyunu",
+            "difficulty": "Orta",
+            "maxScore": 3000,
+            "controls": "WASD ve yön tuşları"
+        },
+        "space": {
+            "name": "Uzay Savunması",
+            "description": "Asteroidleri yok et",
+            "difficulty": "Zor",
+            "maxScore": 8000,
+            "controls": "Yön tuşları, space"
+        }
+    },
+    "settings": {
+        "defaultVolume": 50,
+        "soundEnabled": true,
+        "musicEnabled": false,
+        "theme": "dark",
+        "language": "tr"
+    },
+    "achievements": [
+        {
+            "id": "first_win",
+            "name": "İlk Zafer",
+            "description": "İlk oyununu kazan",
+            "icon": "🏆",
+            "unlocked": false
+        },
+        {
+            "id": "high_scorer",
+            "name": "Yüksek Skorer",
+            "description": "1000 puan üstü skor yap",
+            "icon": "⭐",
+            "unlocked": false
+        },
+        {
+            "id": "speed_demon",
+            "name": "Hız Şeytanı",
+            "description": "Oyunu 30 saniyede bitir",
+            "icon": "⚡",
+            "unlocked": false
+        },
+        {
+            "id": "perfectionist",
+            "name": "Mükemmelliyetçi",
+            "description": "Maksimum skor yap",
+            "icon": "💎",
+            "unlocked": false
+        },
+        {
+            "id": "explorer",
+            "name": "Kaşif",
+            "description": "Tüm oyunları oyna",
+            "icon": "🗺️",
+            "unlocked": false
+        }
+    ],
+    "leaderboard": {
+        "global": [],
+        "weekly": [],
+        "monthly": []
+    },
+    "stats": {
+        "totalGamesPlayed": 0,
+        "totalScore": 0,
+        "bestGame": "",
+        "playTime": 0,
+        "gamesPlayed": {
+            "xox": 0,
+            "snake": 0,
+            "tetris": 0,
+            "memory": 0,
+            "pong": 0,
+            "space": 0
+        }
+    },
+    "tips": [
+        "XOX'ta köşeleri kontrol et!",
+        "Yılan oyununda duvarlardan kaçın",
+        "Hafıza oyununda desenleri hatırla",
+        "Pong'da topu merkezde tut",
+        "Uzay savunmasında erken ateş et"
+    ],
+    "changelog": [
+        {
+            "version": "1.0.0",
+            "date": "2026-01-01",
+            "changes": [
+                "İlk sürüm yayınlandı",
+                "6 farklı oyun eklendi",
+                "Ses efektleri ve müzik sistemi",
+                "Yüksek skor tablosu",
+                "Responsive tasarım"
+            ]
+        }
+    ]
+}
