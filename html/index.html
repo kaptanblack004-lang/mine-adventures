@@ -1,0 +1,1422 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 Efsanevi Mini Oyunlar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .signature {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 10px;
+        }
+
+        .connection-status {
+            padding: 10px 20px;
+            border-radius: 25px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .connection-status.connected {
+            background: rgba(16, 185, 129, 0.2);
+            border: 2px solid #10b981;
+            color: #10b981;
+        }
+
+        .connection-status.disconnected {
+            background: rgba(239, 68, 68, 0.2);
+            border: 2px solid #ef4444;
+            color: #ef4444;
+        }
+
+        .screen {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .game-card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 30px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            touch-action: manipulation;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .game-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .game-title {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .game-description {
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        .room-selection {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .room-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .room-btn, .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            touch-action: manipulation;
+        }
+
+        .room-btn:hover, .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .room-btn:disabled, .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .name-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+
+        .name-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .waiting-screen {
+            text-align: center;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .game-container {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .game-board {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .chat-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            height: 400px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .game-info {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .turn-indicator {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .score-display {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* XOX Stilleri */
+        .xox-board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 10px;
+            margin: 20px auto;
+            width: fit-content;
+        }
+
+        .xox-cell {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            touch-action: manipulation;
+        }
+
+        .xox-cell:hover:not(.taken) {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .xox-cell.taken {
+            cursor: not-allowed;
+        }
+
+        .xox-cell.x {
+            color: #ff6b6b;
+        }
+
+        .xox-cell.o {
+            color: #4ecdc4;
+        }
+
+        /* Dört Dörtlük Stilleri */
+        .connect4-board {
+            display: grid;
+            grid-template-columns: repeat(7, 60px);
+            grid-template-rows: repeat(6, 60px);
+            gap: 5px;
+            margin: 20px auto;
+            width: fit-content;
+        }
+
+        .connect4-cell {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            touch-action: manipulation;
+        }
+
+        .connect4-cell:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .connect4-cell.red {
+            background: #ff6b6b;
+        }
+
+        .connect4-cell.yellow {
+            background: #ffd93d;
+        }
+
+        /* Amiral Battı Stilleri */
+        .battleship-board {
+            display: grid;
+            grid-template-columns: repeat(10, 40px);
+            grid-template-rows: repeat(10, 40px);
+            gap: 2px;
+            margin: 20px auto;
+            width: fit-content;
+        }
+
+        .battleship-cell {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            touch-action: manipulation;
+        }
+
+        .battleship-cell:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .battleship-cell.hit {
+            background: #ff6b6b;
+        }
+
+        .battleship-cell.miss {
+            background: #4ecdc4;
+        }
+
+        .battleship-cell.ship {
+            background: #ffd93d;
+        }
+
+        /* Adam Asmaca Stilleri */
+        .hangman-container {
+            text-align: center;
+            margin: 20px auto;
+        }
+
+        .hangman-word {
+            font-size: 2rem;
+            letter-spacing: 10px;
+            margin: 20px 0;
+        }
+
+        .hangman-letters {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .hangman-letter {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            touch-action: manipulation;
+        }
+
+        .hangman-letter:hover:not(.used) {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .hangman-letter.used {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .hangman-drawing {
+            font-size: 3rem;
+            margin: 20px 0;
+        }
+
+        /* Dama Stilleri */
+        .checkers-board {
+            display: grid;
+            grid-template-columns: repeat(8, 50px);
+            grid-template-rows: repeat(8, 50px);
+            gap: 0;
+            margin: 20px auto;
+            border: 3px solid rgba(255, 255, 255, 0.5);
+            border-radius: 10px;
+        }
+
+        .checkers-cell {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .checkers-cell.black {
+            background: #1e293b;
+        }
+
+        .checkers-cell.white {
+            background: #e2e8f0;
+        }
+
+        .checkers-piece {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .checkers-piece.red {
+            background: #ff6b6b;
+            border: 2px solid #c92a2a;
+        }
+
+        .checkers-piece.black {
+            background: #2d3748;
+            border: 2px solid #1a202c;
+        }
+
+        .checkers-piece.king::after {
+            content: '♔';
+            position: absolute;
+            color: gold;
+            font-size: 20px;
+        }
+
+        /* Taş Kağıt Makas Stilleri */
+        .rps-container {
+            text-align: center;
+            margin: 20px auto;
+        }
+
+        .rps-choices {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .rps-choice {
+            font-size: 4rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            touch-action: manipulation;
+        }
+
+        .rps-choice:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .rps-result {
+            font-size: 1.5rem;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+
+        /* Bilgi Yarışması Stilleri */
+        .quiz-container {
+            text-align: center;
+            margin: 20px auto;
+        }
+
+        .quiz-question {
+            font-size: 1.3rem;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+        }
+
+        .quiz-answers {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .quiz-answer {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            touch-action: manipulation;
+        }
+
+        .quiz-answer:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Zar Oyunu Stilleri */
+        .dice-container {
+            text-align: center;
+            margin: 20px auto;
+        }
+
+        .dice {
+            font-size: 5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 3px solid rgba(255, 255, 255, 0.5);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px;
+            display: inline-block;
+            animation: rollDice 0.5s ease;
+        }
+
+        @keyframes rollDice {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.2); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
+        .winner-animation {
+            animation: winnerPulse 1s ease infinite;
+        }
+
+        @keyframes winnerPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .game-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .chat-container {
+                height: 300px;
+            }
+            
+            .game-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .xox-board {
+                grid-template-columns: repeat(3, 80px);
+                grid-template-rows: repeat(3, 80px);
+            }
+            
+            .connect4-board {
+                grid-template-columns: repeat(7, 40px);
+                grid-template-rows: repeat(6, 40px);
+            }
+            
+            .battleship-board {
+                grid-template-columns: repeat(10, 30px);
+                grid-template-rows: repeat(10, 30px);
+            }
+            
+            .checkers-board {
+                grid-template-columns: repeat(8, 40px);
+                grid-template-rows: repeat(8, 40px);
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .game-icon {
+                font-size: 2rem;
+            }
+            
+            .room-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎮 Efsanevi Mini Oyunlar</h1>
+            <div class="signature">created by burakcskan ✰</div>
+        </header>
+
+        <div class="connection-status disconnected" id="connectionStatus">
+            🔴 Bağlı Değil
+        </div>
+
+        <!-- Ana Menü -->
+        <div class="screen active" id="menuScreen">
+            <div class="game-grid">
+                <div class="game-card" onclick="selectGame('xox')">
+                    <div class="game-icon">❌⭕</div>
+                    <div class="game-title">XOX</div>
+                    <div class="game-description">Klasık üçleme oyunu</div>
+                </div>
+                <div class="game-card" onclick="selectGame('connect4')">
+                    <div class="game-icon">🔴</div>
+                    <div class="game-title">Dört Dörtlük</div>
+                    <div class="game-description">Sütuna taşı, 4'ü birleştir</div>
+                </div>
+                <div class="game-card" onclick="selectGame('battleship')">
+                    <div class="game-icon">🚢</div>
+                    <div class="game-title">Amiral Battı</div>
+                    <div class="game-description">Gemi yerleştir, savaş başlat</div>
+                </div>
+                <div class="game-card" onclick="selectGame('hangman')">
+                    <div class="game-icon">✏️</div>
+                    <div class="game-title">Adam Asmaca</div>
+                    <div class="game-description">Kelime tahmin et</div>
+                </div>
+                <div class="game-card" onclick="selectGame('checkers')">
+                    <div class="game-icon">♟️</div>
+                    <div class="game-title">Dama</div>
+                    <div class="game-description">Taşları ye, kral ol</div>
+                </div>
+                <div class="game-card" onclick="selectGame('rps')">
+                    <div class="game-icon">🎯</div>
+                    <div class="game-title">Taş Kağıt Makas</div>
+                    <div class="game-description">Aynı anda seç, kazan</div>
+                </div>
+                <div class="game-card" onclick="selectGame('quiz')">
+                    <div class="game-icon">🧠</div>
+                    <div class="game-title">Bilgi Yarışması</div>
+                    <div class="game-description">Soruları cevapla, puan topla</div>
+                </div>
+                <div class="game-card" onclick="selectGame('dice')">
+                    <div class="game-icon">🎲</div>
+                    <div class="game-title">Zar Oyunu</div>
+                    <div class="game-description">Zar at, en yükseği kazan</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Oda Seçimi -->
+        <div class="screen" id="roomScreen">
+            <div class="room-selection">
+                <h2>🏠 Oda Seçimi</h2>
+                <input type="text" class="name-input" id="nameInput" placeholder="İsminizi girin..." maxlength="20">
+                <div class="room-buttons">
+                    <button class="room-btn" onclick="selectRoom('Room1')">Oda 1</button>
+                    <button class="room-btn" onclick="selectRoom('Room2')">Oda 2</button>
+                    <button class="room-btn" onclick="selectRoom('Room3')">Oda 3</button>
+                </div>
+                <button class="btn" onclick="backToMenu()">⬅️ Ana Menü</button>
+            </div>
+        </div>
+
+        <!-- Bekleme Ekranı -->
+        <div class="screen" id="waitingScreen">
+            <div class="waiting-screen">
+                <h2>⏳ Oyuncu Bekleniyor...</h2>
+                <div class="game-info">
+                    <div class="turn-indicator">Oda: <span id="currentRoomName"></span></div>
+                    <div class="score-display">Oyuncu: <span id="playerName"></span></div>
+                </div>
+                <button class="btn" onclick="leaveRoom()">🚪 Odadan Ayrıl</button>
+            </div>
+        </div>
+
+        <!-- Oyun Ekranı -->
+        <div class="screen" id="gameScreen">
+            <div class="game-info">
+                <div class="turn-indicator" id="turnIndicator">Sıra: Siz</div>
+                <div class="score-display" id="scoreDisplay">Skor: 0 - 0</div>
+            </div>
+            <div class="game-container">
+                <div class="game-board" id="gameBoard">
+                    <!-- Oyun tahtası burada oluşturulacak -->
+                </div>
+                <div class="chat-container">
+                    <div class="chat-messages" id="chatMessages"></div>
+                    <div class="chat-input-container">
+                        <input type="text" class="chat-input" id="chatInput" placeholder="Mesajınızı yazın..." maxlength="100">
+                        <button class="btn" onclick="sendMessage()">Gönder</button>
+                    </div>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn" onclick="restartGame()">🔄 Yeniden Başla</button>
+                <button class="btn" onclick="leaveRoom()">🚪 Odadan Ayrıl</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // WebSocket ve Oyun Mantığı
+        let ws = null;
+        let currentGame = null;
+        let currentRoom = null;
+        let playerName = null;
+        let isMyTurn = false;
+        let gameData = null;
+
+        // Oyun verileri
+        const games = {
+            xox: { name: 'XOX', icon: '❌⭕' },
+            connect4: { name: 'Dört Dörtlük', icon: '🔴' },
+            battleship: { name: 'Amiral Battı', icon: '🚢' },
+            hangman: { name: 'Adam Asmaca', icon: '✏️' },
+            checkers: { name: 'Dama', icon: '♟️' },
+            rps: { name: 'Taş Kağıt Makas', icon: '🎯' },
+            quiz: { name: 'Bilgi Yarışması', icon: '🧠' },
+            dice: { name: 'Zar Oyunu', icon: '🎲' }
+        };
+
+        // Quiz soruları
+        const quizQuestions = [
+            { question: "Türkiye'nin başkenti neresidir?", answers: ["İstanbul", "Ankara", "İzmir", "Bursa"], correct: 1 },
+            { question: "2 + 2 = ?", answers: ["3", "4", "5", "6"], correct: 1 },
+            { question: "En büyük gezegen hangisidir?", answers: ["Mars", "Jüpiter", "Satürn", "Dünya"], correct: 1 },
+            { question: "Renklerin ana renkleri kaç tanedir?", answers: ["2", "3", "4", "5"], correct: 1 },
+            { question: "Türkiye'nin kaç ili vardır?", answers: ["71", "72", "73", "81"], correct: 3 }
+        ];
+
+        // WebSocket bağlantısı
+        function connectWebSocket() {
+            const wsUrl = (window.location.protocol === 'https:' ? 'wss:' : 'ws:') + '//' + window.location.hostname + '/ws';
+            
+            try {
+                ws = new WebSocket(wsUrl);
+                
+                ws.onopen = function() {
+                    updateConnectionStatus(true);
+                    console.log('WebSocket bağlantısı kuruldu');
+                };
+                
+                ws.onmessage = function(event) {
+                    const data = JSON.parse(event.data);
+                    handleWebSocketMessage(data);
+                };
+                
+                ws.onclose = function() {
+                    updateConnectionStatus(false);
+                    console.log('WebSocket bağlantısı koptu');
+                    // 5 saniye sonra tekrar bağlanmayı dene
+                    setTimeout(connectWebSocket, 5000);
+                };
+                
+                ws.onerror = function(error) {
+                    console.error('WebSocket hatası:', error);
+                    updateConnectionStatus(false);
+                };
+            } catch (error) {
+                console.error('WebSocket oluşturma hatası:', error);
+                updateConnectionStatus(false);
+            }
+        }
+
+        // WebSocket mesajlarını işle
+        function handleWebSocketMessage(data) {
+            switch(data.type) {
+                case 'room_joined':
+                    handleRoomJoined(data);
+                    break;
+                case 'game_start':
+                    handleGameStart(data);
+                    break;
+                case 'game_update':
+                    handleGameUpdate(data);
+                    break;
+                case 'game_end':
+                    handleGameEnd(data);
+                    break;
+                case 'chat':
+                    handleChatMessage(data);
+                    break;
+                case 'player_left':
+                    handlePlayerLeft(data);
+                    break;
+            }
+        }
+
+        // Bağlantı durumunu güncelle
+        function updateConnectionStatus(connected) {
+            const status = document.getElementById('connectionStatus');
+            if (connected) {
+                status.className = 'connection-status connected';
+                status.innerHTML = '🟢 Bağlı';
+            } else {
+                status.className = 'connection-status disconnected';
+                status.innerHTML = '🔴 Bağlı Değil';
+            }
+        }
+
+        // Ekran değiştirme
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        // Oyun seçimi
+        function selectGame(gameType) {
+            currentGame = gameType;
+            showScreen('roomScreen');
+            document.getElementById('nameInput').focus();
+        }
+
+        // Oda seçimi
+        function selectRoom(roomId) {
+            const nameInput = document.getElementById('nameInput').value.trim();
+            if (!nameInput) {
+                alert('Lütfen isminizi girin!');
+                return;
+            }
+            
+            playerName = nameInput;
+            currentRoom = roomId;
+            
+            // WebSocket üzerinden odaya katıl
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    type: 'join_room',
+                    roomId: roomId,
+                    game: currentGame,
+                    player: playerName
+                }));
+            }
+            
+            showScreen('waitingScreen');
+            document.getElementById('currentRoomName').textContent = roomId;
+            document.getElementById('playerName').textContent = playerName;
+        }
+
+        // Odaya katılma
+        function handleRoomJoined(data) {
+            console.log('Odaya katıldı:', data);
+            // Bekleme ekranında kal, oyun başlayınca yönlendirilecek
+        }
+
+        // Oyun başlatma
+        function handleGameStart(data) {
+            gameData = data.gameData;
+            isMyTurn = true;
+            showScreen('gameScreen');
+            initializeGame();
+            updateTurnIndicator();
+        }
+
+        // Oyun güncelleme
+        function handleGameUpdate(data) {
+            gameData = data.gameData;
+            isMyTurn = data.isMyTurn !== undefined ? data.isMyTurn : !isMyTurn;
+            updateGameBoard();
+            updateTurnIndicator();
+        }
+
+        // Oyun bitişi
+        function handleGameEnd(data) {
+            const winner = data.winner;
+            const message = winner === playerName ? '🎉 Kazandınız!' : `😔 ${winner} kazandı!`;
+            
+            document.getElementById('turnIndicator').innerHTML = `<div class="winner-animation">${message}</div>`;
+            
+            // Oyun tahtasını devre dışı bırak
+            disableGameBoard();
+        }
+
+        // Sohbet mesajı
+        function handleChatMessage(data) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.innerHTML = `<strong>${data.player}:</strong> ${data.message}`;
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Oyuncu ayrıldı
+        function handlePlayerLeft(data) {
+            alert(`${data.player} odadan ayrıldı. Oyun sonlandırılıyor.`);
+            backToMenu();
+        }
+
+        // Oyun başlatma
+        function initializeGame() {
+            const gameBoard = document.getElementById('gameBoard');
+            gameBoard.innerHTML = '';
+            
+            switch(currentGame) {
+                case 'xox':
+                    createXOXBoard();
+                    break;
+                case 'connect4':
+                    createConnect4Board();
+                    break;
+                case 'battleship':
+                    createBattleshipBoard();
+                    break;
+                case 'hangman':
+                    createHangmanGame();
+                    break;
+                case 'checkers':
+                    createCheckersBoard();
+                    break;
+                case 'rps':
+                    createRPSGame();
+                    break;
+                case 'quiz':
+                    createQuizGame();
+                    break;
+                case 'dice':
+                    createDiceGame();
+                    break;
+            }
+        }
+
+        // XOX tahtası
+        function createXOXBoard() {
+            const gameBoard = document.getElementById('gameBoard');
+            const board = document.createElement('div');
+            board.className = 'xox-board';
+            
+            for (let i = 0; i < 9; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'xox-cell';
+                cell.dataset.index = i;
+                cell.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    makeXOXMove(i);
+                });
+                cell.addEventListener('touchend', function(e) {
+                    makeXOXMove(i);
+                });
+                board.appendChild(cell);
+            }
+            
+            gameBoard.appendChild(board);
+            updateGameBoard();
+        }
+
+        // XOX hamlesi
+        function makeXOXMove(index) {
+            if (gameData && gameData.board && gameData.board[index]) return;
+            
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    type: 'game_move',
+                    game: currentGame,
+                    roomId: currentRoom,
+                    move: { index: index, player: playerName }
+                }));
+                
+                if (!gameData) gameData = { board: Array(9).fill(null) };
+                gameData.board[index] = isMyTurn ? 'X' : 'O';
+                updateXOXBoard();
+                isMyTurn = false;
+                updateTurnIndicator();
+            }
+        }
+
+        // Dört Dörtlük tahtası
+        function createConnect4Board() {
+            const gameBoard = document.getElementById('gameBoard');
+            const board = document.createElement('div');
+            board.className = 'connect4-board';
+            
+            for (let i = 0; i < 42; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'connect4-cell';
+                cell.dataset.index = i;
+                cell.onclick = () => makeConnect4Move(i);
+                board.appendChild(cell);
+            }
+            
+            gameBoard.appendChild(board);
+            updateGameBoard();
+        }
+
+        // Dört Dörtlük hamlesi
+        function makeConnect4Move(index) {
+            if (!isMyTurn) return;
+            
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    type: 'game_move',
+                    game: currentGame,
+                    roomId: currentRoom,
+                    move: { index, player: playerName }
+                }));
+            }
+        }
+
+        // Amiral Battı tahtası
+        function createBattleshipBoard() {
+            const gameBoard = document.getElementById('gameBoard');
+            const board = document.createElement('div');
+            board.className = 'battleship-board';
+            
+            for (let i = 0; i < 100; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'battleship-cell';
+                cell.dataset.index = i;
+                cell.onclick = () => makeBattleshipMove(i);
+                board.appendChild(cell);
+            }
+            
+            gameBoard.appendChild(board);
+            updateGameBoard();
+        }
+
+        // Amiral Battı hamlesi
+        function makeBattleshipMove(index) {
+            if (!isMyTurn) return;
+            
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    type: 'game_move',
+                    game: currentGame,
+                    roomId: currentRoom,
+                    move: { index, player: playerName }
+                }));
+            }
+        }
+
+        // Adam Asmaca oyunu
+        function createHangmanGame() {
+            const gameBoard = document.getElementById('gameBoard');
+            const container = document.createElement('div');
+            container.className = 'hangman-container';
+            
+            container.innerHTML = `
+                <div class="hangman-drawing" id="hangmanDrawing"></div>
+                <div class="hangman-word" id="hangmanWord"></div>
+                <div class="hangman-letters" id="hangmanLetters"></div>
+            `;
+            
+            gameBoard.appendChild(container);
+            updateGameBoard();
+        }
+
+        // Dama tahtası
+        function createCheckersBoard() {
+            const gameBoard = document.getElementById('gameBoard');
+            const board = document.createElement('div');
+            board.className = 'checkers-board';
+            
+            for (let i = 0; i < 64; i++) {
+                const cell = document.createElement('div');
+                cell.className = `checkers-cell ${(Math.floor(i/8) + i) % 2 === 0 ? 'white' : 'black'}`;
+                cell.dataset.index = i;
+                cell.onclick = () => makeCheckersMove(i);
+                board.appendChild(cell);
+            }
+            
+            gameBoard.appendChild(board);
+            updateGameBoard();
+        }
+
+        // Dama hamlesi
+        function makeCheckersMove(index) {
+            if (!isMyTurn) return;
+            
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    type: 'game_move',
+                    game: currentGame,
+                    roomId: currentRoom,
+                    move: { index, player: playerName }
+                }));
+            }
+        }
+
+        // Taş Kağıt Makas oyunu
+        function createRPSGame() {
+            const gameBoard = document.getElementById('gameBoard');
+            const container = document.createElement('div');
+            container.className = 'rps-container';
+            
+            container.innerHTML = `
+                <div class="rps-choices">
+                    <div class="rps-choice" onclick="makeRPSMove('rock')">✊</div>
+                    <div class="rps-choice" onclick="makeRPSMove('paper')">✋</div>
+                    <div class="rps-choice" onclick="makeRPSMove('scissors')">✌</div>
+                </div>
+                <div class="rps-result" id="rpsResult">Seçiminizi yapın...</div>
+            `;
+            
+            gameBoard.appendChild(container);
+        }
+
+        // Taş Kağıt Makas hamlesi
+        function makeRPSMove(choice) {
+            if (!isMyTurn) return;
+            
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    type: 'game_move',
+                    game: currentGame,
+                    roomId: currentRoom,
+                    move: { choice, player: playerName }
+                }));
+            }
+        }
+
+        // Bilgi yarışması
+        function createQuizGame() {
+            const gameBoard = document.getElementById('gameBoard');
+            const container = document.createElement('div');
+            container.className = 'quiz-container';
+            
+            const question = quizQuestions[Math.floor(Math.random() * quizQuestions.length)];
+            container.innerHTML = `
+                <div class="quiz-question">${question.question}</div>
+                <div class="quiz-answers">
+                    ${question.answers.map((answer, index) => `
+                        <div class="quiz-answer" onclick="makeQuizMove(${index})">${answer}</div>
+                    `).join('')}
+                </div>
+            `;
+            
+            gameBoard.appendChild(container);
+            gameBoard.dataset.correctAnswer = question.correct;
+        }
+
+        // Bilgi yarışması hamlesi
+        function makeQuizMove(answerIndex) {
+            if (!isMyTurn) return;
+            
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    type: 'game_move',
+                    game: currentGame,
+                    roomId: currentRoom,
+                    move: { answerIndex, player: playerName }
+                }));
+            }
+        }
+
+        // Zar oyunu
+        function createDiceGame() {
+            const gameBoard = document.getElementById('gameBoard');
+            const container = document.createElement('div');
+            container.className = 'dice-container';
+            
+            container.innerHTML = `
+                <div class="dice" id="dice">🎲</div>
+                <button class="btn" onclick="rollDice()">Zar At</button>
+                <div class="rps-result" id="diceResult">Zar atın...</div>
+            `;
+            
+            gameBoard.appendChild(container);
+        }
+
+        // Zar atma
+        function rollDice() {
+            if (!isMyTurn) return;
+            
+            const diceValue = Math.floor(Math.random() * 6) + 1;
+            const diceElement = document.getElementById('dice');
+            diceElement.textContent = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'][diceValue - 1];
+            diceElement.classList.add('dice');
+            
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    type: 'game_move',
+                    game: currentGame,
+                    roomId: currentRoom,
+                    move: { diceValue, player: playerName }
+                }));
+            }
+        }
+
+        // Oyun tahtasını güncelle
+        function updateGameBoard() {
+            if (!gameData) return;
+            
+            switch(currentGame) {
+                case 'xox':
+                    updateXOXBoard();
+                    break;
+                case 'connect4':
+                    updateConnect4Board();
+                    break;
+                case 'battleship':
+                    updateBattleshipBoard();
+                    break;
+                case 'hangman':
+                    updateHangmanGame();
+                    break;
+                case 'checkers':
+                    updateCheckersBoard();
+                    break;
+                case 'rps':
+                    updateRPSGame();
+                    break;
+                case 'quiz':
+                    updateQuizGame();
+                    break;
+                case 'dice':
+                    updateDiceGame();
+                    break;
+            }
+        }
+
+        // XOX tahtasını güncelle
+        function updateXOXBoard() {
+            const cells = document.querySelectorAll('.xox-cell');
+            cells.forEach((cell, index) => {
+                const value = gameData.board[index];
+                cell.textContent = value || '';
+                cell.className = `xox-cell ${value ? 'taken' : ''} ${value}`;
+            });
+        }
+
+        // Dört Dörtlük tahtasını güncelle
+        function updateConnect4Board() {
+            const cells = document.querySelectorAll('.connect4-cell');
+            cells.forEach((cell, index) => {
+                const value = gameData.board[index];
+                cell.className = `connect4-cell ${value || ''}`;
+            });
+        }
+
+        // Amiral Battı tahtasını güncelle
+        function updateBattleshipBoard() {
+            const cells = document.querySelectorAll('.battleship-cell');
+            cells.forEach((cell, index) => {
+                const value = gameData.board[index];
+                cell.className = `battleship-cell ${value || ''}`;
+            });
+        }
+
+        // Adam Asmaca oyununu güncelle
+        function updateHangmanGame() {
+            const wordElement = document.getElementById('hangmanWord');
+            const drawingElement = document.getElementById('hangmanDrawing');
+            
+            if (wordElement) {
+                wordElement.textContent = gameData.displayWord || '';
+            }
+            
+            if (drawingElement) {
+                const wrongCount = gameData.wrongCount || 0;
+                const stages = ['😊', '😐', '😟', '😕', '😢', '😭'];
+                drawingElement.textContent = stages[Math.min(wrongCount, stages.length - 1)];
+            }
+        }
+
+        // Dama tahtasını güncelle
+        function updateCheckersBoard() {
+            const cells = document.querySelectorAll('.checkers-cell');
+            cells.forEach((cell, index) => {
+                const piece = gameData.board[index];
+                if (piece) {
+                    const pieceElement = document.createElement('div');
+                    pieceElement.className = `checkers-piece ${piece}`;
+                    cell.innerHTML = '';
+                    cell.appendChild(pieceElement);
+                } else {
+                    cell.innerHTML = '';
+                }
+            });
+        }
+
+        // Taş Kağıt Makas oyununu güncelle
+        function updateRPSGame() {
+            const resultElement = document.getElementById('rpsResult');
+            if (resultElement && gameData.result) {
+                resultElement.textContent = gameData.result;
+            }
+        }
+
+        // Bilgi yarışmasını güncelle
+        function updateQuizGame() {
+            const resultElement = document.getElementById('rpsResult');
+            if (resultElement && gameData.result) {
+                resultElement.textContent = gameData.result;
+            }
+        }
+
+        // Zar oyununu güncelle
+        function updateDiceGame() {
+            const resultElement = document.getElementById('diceResult');
+            if (resultElement && gameData.result) {
+                resultElement.textContent = gameData.result;
+            }
+        }
+
+        // Sıra göstergesini güncelle
+        function updateTurnIndicator() {
+            const indicator = document.getElementById('turnIndicator');
+            if (indicator) {
+                indicator.textContent = isMyTurn ? 'Sıra: Siz' : `Sıra: Rakip`;
+            }
+        }
+
+        // Skor göstergesini güncelle
+        function updateScoreDisplay() {
+            const scoreDisplay = document.getElementById('scoreDisplay');
+            if (scoreDisplay && gameData.scores) {
+                const myScore = gameData.scores[playerName] || 0;
+                const opponentScore = gameData.scores[gameData.opponent] || 0;
+                scoreDisplay.textContent = `Skor: ${myScore} - ${opponentScore}`;
+            }
+        }
+
+        // Oyun tahtasını devre dışı bırak
+        function disableGameBoard() {
+            const interactiveElements = document.querySelectorAll('.xox-cell, .connect4-cell, .battleship-cell, .checkers-cell, .rps-choice, .quiz-answer, .btn');
+            interactiveElements.forEach(element => {
+                element.style.pointerEvents = 'none';
+                element.style.opacity = '0.5';
+            });
+        }
+
+        // Mesaj gönder
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (message && ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    type: 'chat',
+                    roomId: currentRoom,
+                    player: playerName,
+                    message: message
+                }));
+                input.value = '';
+            }
+        }
+
+        // Oyundan ayrıl
+        function leaveRoom() {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    type: 'leave_room',
+                    roomId: currentRoom,
+                    player: playerName
+                }));
+            }
+            
+            backToMenu();
+        }
+
+        // Oyunu yeniden başlat
+        function restartGame() {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    type: 'restart_game',
+                    roomId: currentRoom,
+                    game: currentGame
+                }));
+            }
+        }
+
+        // Ana menüye dön
+        function backToMenu() {
+            currentGame = null;
+            currentRoom = null;
+            playerName = null;
+            isMyTurn = false;
+            gameData = null;
+            showScreen('menuScreen');
+        }
+
+        // Chat input için enter tuşu
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatInput = document.getElementById('chatInput');
+            if (chatInput) {
+                chatInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        sendMessage();
+                    }
+                });
+            }
+            
+            // WebSocket bağlantısını başlat
+            connectWebSocket();
+        });
+
+        // Sayfa yüklendiğinde kontrol et
+        window.addEventListener('load', function() {
+            console.log('Efsanevi Mini Oyunlar yüklendi');
+            updateConnectionStatus(false);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1227 @@
+// Efsanevi Mini Oyunlar - HTML/CSS Tabanlı Oyunlar
+// Canvas kullanmayan, tamamen HTML/CSS/JS tabanlı oyunlar
+
+// XOX Oyunu
+class TicTacToe {
+    constructor(canvasId) {
+        this.canvasId = canvasId;
+        this.board = Array(9).fill('');
+        this.currentPlayer = 'X';
+        this.gameOver = false;
+        this.score = 0;
+        this.level = 1;
+        this.lives = 3;
+        this.paused = false;
+        this.isRunning = false;
+        
+        this.createBoard();
+    }
+    
+    createBoard() {
+        const container = document.getElementById('game-canvas-container');
+        container.innerHTML = `
+            <div class="xox-board">
+                <div class="xox-row">
+                    <div class="xox-cell" data-index="0"></div>
+                    <div class="xox-cell" data-index="1"></div>
+                    <div class="xox-cell" data-index="2"></div>
+                </div>
+                <div class="xox-row">
+                    <div class="xox-cell" data-index="3"></div>
+                    <div class="xox-cell" data-index="4"></div>
+                    <div class="xox-cell" data-index="5"></div>
+                </div>
+                <div class="xox-row">
+                    <div class="xox-cell" data-index="6"></div>
+                    <div class="xox-cell" data-index="7"></div>
+                    <div class="xox-cell" data-index="8"></div>
+                </div>
+            </div>
+            <div class="game-info">
+                <p>Sıra: <span id="current-player">X</span></p>
+                <p id="game-status">Oyun devam ediyor...</p>
+            </div>
+        `;
+        
+        // Event listener'ları ekle
+        container.querySelectorAll('.xox-cell').forEach((cell, index) => {
+            cell.addEventListener('click', () => this.handleClick(index));
+        });
+    }
+    
+    handleClick(index) {
+        if (this.gameOver || this.paused || this.board[index]) return;
+        
+        this.board[index] = this.currentPlayer;
+        const cell = document.querySelector(`[data-index="${index}"]`);
+        cell.textContent = this.currentPlayer;
+        cell.classList.add(this.currentPlayer.toLowerCase());
+        
+        if (this.checkWinner()) {
+            this.gameOver = true;
+            this.score += 100;
+            document.getElementById('game-status').textContent = `${this.currentPlayer} kazandı!`;
+            this.showNotification(`${this.currentPlayer} kazandı! 🎉`);
+        } else if (this.board.every(cell => cell)) {
+            this.gameOver = true;
+            document.getElementById('game-status').textContent = 'Berabere!';
+            this.showNotification('Berabere! 🤝');
+        } else {
+            this.currentPlayer = this.currentPlayer === 'X' ? 'O' : 'X';
+            document.getElementById('current-player').textContent = this.currentPlayer;
+        }
+    }
+    
+    checkWinner() {
+        const winPatterns = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8], // Yatay
+            [0, 3, 6], [1, 4, 7], [2, 5, 8], // Dikey
+            [0, 4, 8], [2, 4, 6] // Çapraz
+        ];
+        
+        return winPatterns.some(pattern => {
+            const [a, b, c] = pattern;
+            return this.board[a] && this.board[a] === this.board[b] && this.board[a] === this.board[c];
+        });
+    }
+    
+    showNotification(message) {
+        if (typeof showNotification === 'function') {
+            showNotification(message, 'success');
+        }
+    }
+    
+    start() {
+        this.isRunning = true;
+        this.reset();
+    }
+    
+    stop() {
+        this.isRunning = false;
+    }
+    
+    pause() {
+        this.paused = !this.paused;
+    }
+    
+    reset() {
+        this.board = Array(9).fill('');
+        this.currentPlayer = 'X';
+        this.gameOver = false;
+        
+        document.querySelectorAll('.xox-cell').forEach(cell => {
+            cell.textContent = '';
+            cell.classList.remove('x', 'o');
+        });
+        
+        document.getElementById('current-player').textContent = 'X';
+        document.getElementById('game-status').textContent = 'Oyun devam ediyor...';
+    }
+}
+
+// Yılan Oyunu
+class Snake {
+    constructor(canvasId) {
+        this.canvasId = canvasId;
+        this.gridSize = 20;
+        this.cellSize = 20;
+        this.snake = [{x: 10, y: 10}];
+        this.direction = {x: 0, y: 0};
+        this.food = this.generateFood();
+        this.score = 0;
+        this.level = 1;
+        this.lives = 3;
+        this.paused = false;
+        this.isRunning = false;
+        this.gameLoop = null;
+        
+        this.createBoard();
+        this.setupControls();
+    }
+    
+    createBoard() {
+        const container = document.getElementById('game-canvas-container');
+        container.innerHTML = `
+            <div class="snake-board" style="width: ${this.gridSize * this.cellSize}px; height: ${this.gridSize * this.cellSize}px;">
+                <!-- Grid cells will be generated by JS -->
+            </div>
+            <div class="game-info">
+                <p>Skor: <span id="snake-score">0</span></p>
+                <p>Seviye: <span id="snake-level">1</span></p>
+                <p id="snake-status">Yön tuşları ile başlayın</p>
+            </div>
+        `;
+        
+        // Grid oluştur
+        const board = container.querySelector('.snake-board');
+        for (let i = 0; i < this.gridSize * this.gridSize; i++) {
+            const cell = document.createElement('div');
+            cell.className = 'snake-cell';
+            cell.style.width = `${this.cellSize}px`;
+            cell.style.height = `${this.cellSize}px`;
+            board.appendChild(cell);
+        }
+    }
+    
+    setupControls() {
+        this.handleKeyPress = (e) => {
+            if (this.paused || !this.isRunning) return;
+            
+            switch(e.key) {
+                case 'ArrowUp':
+                    if (this.direction.y === 0) {
+                        this.direction = {x: 0, y: -1};
+                    }
+                    break;
+                case 'ArrowDown':
+                    if (this.direction.y === 0) {
+                        this.direction = {x: 0, y: 1};
+                    }
+                    break;
+                case 'ArrowLeft':
+                    if (this.direction.x === 0) {
+                        this.direction = {x: -1, y: 0};
+                    }
+                    break;
+                case 'ArrowRight':
+                    if (this.direction.x === 0) {
+                        this.direction = {x: 1, y: 0};
+                    }
+                    break;
+            }
+        };
+        
+        document.addEventListener('keydown', this.handleKeyPress);
+    }
+    
+    generateFood() {
+        return {
+            x: Math.floor(Math.random() * this.gridSize),
+            y: Math.floor(Math.random() * this.gridSize)
+        };
+    }
+    
+    update() {
+        if (!this.isRunning || this.paused) return;
+        
+        // Hareket et
+        const head = {...this.snake[0]};
+        head.x += this.direction.x;
+        head.y += this.direction.y;
+        
+        // Çarpışma kontrolü
+        if (head.x < 0 || head.x >= this.gridSize || 
+            head.y < 0 || head.y >= this.gridSize ||
+            this.snake.some(segment => segment.x === head.x && segment.y === head.y)) {
+            this.gameOver();
+            return;
+        }
+        
+        this.snake.unshift(head);
+        
+        // Yem kontrolü
+        if (head.x === this.food.x && head.y === this.food.y) {
+            this.score += 10;
+            this.food = this.generateFood();
+            this.level = Math.floor(this.score / 100) + 1;
+            this.updateUI();
+        } else {
+            this.snake.pop();
+        }
+        
+        this.render();
+    }
+    
+    render() {
+        const cells = document.querySelectorAll('.snake-cell');
+        cells.forEach(cell => cell.className = 'snake-cell');
+        
+        // Yılanı çiz
+        this.snake.forEach((segment, index) => {
+            const cellIndex = segment.y * this.gridSize + segment.x;
+            if (cells[cellIndex]) {
+                cells[cellIndex].classList.add(index === 0 ? 'snake-head' : 'snake-body');
+            }
+        });
+        
+        // Yemi çiz
+        const foodIndex = this.food.y * this.gridSize + this.food.x;
+        if (cells[foodIndex]) {
+            cells[foodIndex].classList.add('snake-food');
+        }
+    }
+    
+    updateUI() {
+        document.getElementById('snake-score').textContent = this.score;
+        document.getElementById('snake-level').textContent = this.level;
+    }
+    
+    gameOver() {
+        this.isRunning = false;
+        this.lives--;
+        document.getElementById('snake-status').textContent = `Oyun bitti! Skor: ${this.score}`;
+        
+        if (typeof showNotification === 'function') {
+            showNotification(`Oyun bitti! Skor: ${this.score}`, 'error');
+        }
+    }
+    
+    start() {
+        this.isRunning = true;
+        this.direction = {x: 1, y: 0};
+        document.getElementById('snake-status').textContent = 'Oyun devam ediyor...';
+        
+        this.gameLoop = setInterval(() => this.update(), 100);
+    }
+    
+    stop() {
+        this.isRunning = false;
+        if (this.gameLoop) {
+            clearInterval(this.gameLoop);
+            this.gameLoop = null;
+        }
+        document.removeEventListener('keydown', this.handleKeyPress);
+    }
+    
+    pause() {
+        this.paused = !this.paused;
+        document.getElementById('snake-status').textContent = this.paused ? 'Duraklatıldı' : 'Oyun devam ediyor...';
+    }
+    
+    reset() {
+        this.snake = [{x: 10, y: 10}];
+        this.direction = {x: 0, y: 0};
+        this.food = this.generateFood();
+        this.score = 0;
+        this.level = 1;
+        this.lives = 3;
+        this.paused = false;
+        this.updateUI();
+        this.render();
+    }
+}
+
+// Tetris Oyunu
+class Tetris {
+    constructor(canvasId) {
+        this.canvasId = canvasId;
+        this.cols = 10;
+        this.rows = 20;
+        this.board = Array(this.rows).fill().map(() => Array(this.cols).fill(0));
+        this.currentPiece = null;
+        this.score = 0;
+        this.level = 1;
+        this.lives = 3;
+        this.paused = false;
+        this.isRunning = false;
+        this.gameLoop = null;
+        this.dropCounter = 0;
+        this.dropInterval = 1000;
+        
+        this.pieces = [
+            [[1,1,1,1]],           // I
+            [[1,1],[1,1]],         // O
+            [[0,1,0],[1,1,1]],     // T
+            [[1,1,0],[0,1,1]],     // S
+            [[0,1,1],[1,1,0]],     // Z
+            [[1,0,0],[1,1,1]],     // L
+            [[0,0,1],[1,1,1]]      // J
+        ];
+        
+        this.colors = [
+            '#00f0f0', '#f0f000', '#a000f0', '#00f000', 
+            '#f00000', '#f0a000', '#0000f0'
+        ];
+        
+        this.createBoard();
+        this.setupControls();
+        this.spawnPiece();
+    }
+    
+    createBoard() {
+        const container = document.getElementById('game-canvas-container');
+        container.innerHTML = `
+            <div class="tetris-board" style="width: ${this.cols * 25}px; height: ${this.rows * 25}px;">
+                <!-- Grid cells will be generated by JS -->
+            </div>
+            <div class="game-info">
+                <p>Skor: <span id="tetris-score">0</span></p>
+                <p>Seviye: <span id="tetris-level">1</span></p>
+                <p id="tetris-status">Ok tuşları ile oynayın</p>
+            </div>
+        `;
+        
+        // Grid oluştur
+        const board = container.querySelector('.tetris-board');
+        for (let i = 0; i < this.rows * this.cols; i++) {
+            const cell = document.createElement('div');
+            cell.className = 'tetris-cell';
+            cell.style.width = '25px';
+            cell.style.height = '25px';
+            board.appendChild(cell);
+        }
+    }
+    
+    setupControls() {
+        this.handleKeyPress = (e) => {
+            if (this.paused || !this.isRunning) return;
+            
+            switch(e.key) {
+                case 'ArrowLeft':
+                    this.movePiece(-1, 0);
+                    break;
+                case 'ArrowRight':
+                    this.movePiece(1, 0);
+                    break;
+                case 'ArrowDown':
+                    this.movePiece(0, 1);
+                    this.score += 1;
+                    break;
+                case 'ArrowUp':
+                case ' ':
+                    this.rotatePiece();
+                    break;
+            }
+        };
+        
+        document.addEventListener('keydown', this.handleKeyPress);
+    }
+    
+    spawnPiece() {
+        const pieceIndex = Math.floor(Math.random() * this.pieces.length);
+        this.currentPiece = {
+            shape: this.pieces[pieceIndex],
+            color: this.colors[pieceIndex],
+            x: Math.floor(this.cols / 2) - 1,
+            y: 0
+        };
+        
+        if (this.collision()) {
+            this.gameOver();
+        }
+    }
+    
+    collision(dx = 0, dy = 0) {
+        for (let y = 0; y < this.currentPiece.shape.length; y++) {
+            for (let x = 0; x < this.currentPiece.shape[y].length; x++) {
+                if (this.currentPiece.shape[y][x]) {
+                    const newX = this.currentPiece.x + x + dx;
+                    const newY = this.currentPiece.y + y + dy;
+                    
+                    if (newX < 0 || newX >= this.cols || newY >= this.rows) {
+                        return true;
+                    }
+                    
+                    if (newY >= 0 && this.board[newY][newX]) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    
+    movePiece(dx, dy) {
+        if (!this.collision(dx, dy)) {
+            this.currentPiece.x += dx;
+            this.currentPiece.y += dy;
+            this.render();
+            return true;
+        }
+        return false;
+    }
+    
+    rotatePiece() {
+        const rotated = this.currentPiece.shape[0].map((_, i) =>
+            this.currentPiece.shape.map(row => row[i]).reverse()
+        );
+        
+        if (!this.collision(0, 0, rotated)) {
+            this.currentPiece.shape = rotated;
+            this.render();
+        }
+    }
+    
+    lockPiece() {
+        this.currentPiece.shape.forEach((row, y) => {
+            row.forEach((value, x) => {
+                if (value) {
+                    const boardY = this.currentPiece.y + y;
+                    const boardX = this.currentPiece.x + x;
+                    if (boardY >= 0) {
+                        this.board[boardY][boardX] = this.currentPiece.color;
+                    }
+                }
+            });
+        });
+        
+        this.clearLines();
+        this.spawnPiece();
+    }
+    
+    clearLines() {
+        let linesCleared = 0;
+        
+        for (let y = this.rows - 1; y >= 0; y--) {
+            if (this.board[y].every(cell => cell !== 0)) {
+                this.board.splice(y, 1);
+                this.board.unshift(Array(this.cols).fill(0));
+                linesCleared++;
+                y++;
+            }
+        }
+        
+        if (linesCleared > 0) {
+            this.score += linesCleared * 100 * this.level;
+            this.level = Math.floor(this.score / 1000) + 1;
+            this.dropInterval = Math.max(100, 1000 - (this.level - 1) * 100);
+            this.updateUI();
+        }
+    }
+    
+    update() {
+        if (!this.isRunning || this.paused) return;
+        
+        this.dropCounter++;
+        if (this.dropCounter > this.dropInterval / 100) {
+            if (!this.movePiece(0, 1)) {
+                this.lockPiece();
+            }
+            this.dropCounter = 0;
+        }
+    }
+    
+    render() {
+        const cells = document.querySelectorAll('.tetris-cell');
+        cells.forEach(cell => {
+            cell.style.backgroundColor = '#111';
+            cell.style.border = '1px solid #333';
+        });
+        
+        // Board'daki parçaları çiz
+        this.board.forEach((row, y) => {
+            row.forEach((color, x) => {
+                if (color) {
+                    const cellIndex = y * this.cols + x;
+                    if (cells[cellIndex]) {
+                        cells[cellIndex].style.backgroundColor = color;
+                        cells[cellIndex].style.border = '1px solid #555';
+                    }
+                }
+            });
+        });
+        
+        // Mevcut parçayı çiz
+        if (this.currentPiece) {
+            this.currentPiece.shape.forEach((row, y) => {
+                row.forEach((value, x) => {
+                    if (value) {
+                        const boardX = this.currentPiece.x + x;
+                        const boardY = this.currentPiece.y + y;
+                        const cellIndex = boardY * this.cols + boardX;
+                        if (cells[cellIndex] && boardY >= 0) {
+                            cells[cellIndex].style.backgroundColor = this.currentPiece.color;
+                            cells[cellIndex].style.border = '1px solid #555';
+                        }
+                    }
+                });
+            });
+        }
+    }
+    
+    updateUI() {
+        document.getElementById('tetris-score').textContent = this.score;
+        document.getElementById('tetris-level').textContent = this.level;
+    }
+    
+    gameOver() {
+        this.isRunning = false;
+        document.getElementById('tetris-status').textContent = `Oyun bitti! Skor: ${this.score}`;
+        
+        if (typeof showNotification === 'function') {
+            showNotification(`Oyun bitti! Skor: ${this.score}`, 'error');
+        }
+    }
+    
+    start() {
+        this.isRunning = true;
+        document.getElementById('tetris-status').textContent = 'Oyun devam ediyor...';
+        
+        this.gameLoop = setInterval(() => this.update(), 100);
+    }
+    
+    stop() {
+        this.isRunning = false;
+        if (this.gameLoop) {
+            clearInterval(this.gameLoop);
+            this.gameLoop = null;
+        }
+        document.removeEventListener('keydown', this.handleKeyPress);
+    }
+    
+    pause() {
+        this.paused = !this.paused;
+        document.getElementById('tetris-status').textContent = this.paused ? 'Duraklatıldı' : 'Oyun devam ediyor...';
+    }
+    
+    reset() {
+        this.board = Array(this.rows).fill().map(() => Array(this.cols).fill(0));
+        this.score = 0;
+        this.level = 1;
+        this.lives = 3;
+        this.paused = false;
+        this.dropCounter = 0;
+        this.dropInterval = 1000;
+        this.spawnPiece();
+        this.updateUI();
+        this.render();
+    }
+}
+
+// Hafıza Oyunu
+class Memory {
+    constructor(canvasId) {
+        this.canvasId = canvasId;
+        this.cards = [];
+        this.flippedCards = [];
+        this.matchedPairs = 0;
+        this.score = 0;
+        this.level = 1;
+        this.lives = 3;
+        this.paused = false;
+        this.isRunning = false;
+        
+        this.createBoard();
+    }
+    
+    createBoard() {
+        const container = document.getElementById('game-canvas-container');
+        const symbols = ['🎮', '🎯', '🎨', '🎭', '🎪', '🎬', '🎸', '🎺'];
+        const pairs = [...symbols, ...symbols];
+        
+        // Karıştır
+        for (let i = pairs.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [pairs[i], pairs[j]] = [pairs[j], pairs[i]];
+        }
+        
+        container.innerHTML = `
+            <div class="memory-board">
+                ${pairs.map((symbol, index) => `
+                    <div class="memory-card" data-index="${index}" data-symbol="${symbol}">
+                        <div class="memory-card-inner">
+                            <div class="memory-card-front">?</div>
+                            <div class="memory-card-back">${symbol}</div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+            <div class="game-info">
+                <p>Skor: <span id="memory-score">0</span></p>
+                <p>Eşleşme: <span id="memory-matches">0</span>/8</p>
+                <p id="memory-status">Kartları eşleştirin</p>
+            </div>
+        `;
+        
+        // Event listener'ları ekle
+        container.querySelectorAll('.memory-card').forEach(card => {
+            card.addEventListener('click', () => this.flipCard(card));
+        });
+    }
+    
+    flipCard(card) {
+        if (this.paused || !this.isRunning) return;
+        
+        const index = parseInt(card.dataset.index);
+        
+        // Zaten çevrildi veya eşleştiyse dönme
+        if (this.flippedCards.includes(index) || card.classList.contains('matched')) {
+            return;
+        }
+        
+        // İki kart çevrildiyse kontrol et
+        if (this.flippedCards.length === 2) {
+            return;
+        }
+        
+        // Kartı çevir
+        card.classList.add('flipped');
+        this.flippedCards.push(index);
+        
+        // İki kart çevrildiyse eşleşme kontrolü
+        if (this.flippedCards.length === 2) {
+            this.checkMatch();
+        }
+    }
+    
+    checkMatch() {
+        const [index1, index2] = this.flippedCards;
+        const card1 = document.querySelector(`[data-index="${index1}"]`);
+        const card2 = document.querySelector(`[data-index="${index2}"]`);
+        
+        if (card1.dataset.symbol === card2.dataset.symbol) {
+            // Eşleşme
+            setTimeout(() => {
+                card1.classList.add('matched');
+                card2.classList.add('matched');
+                this.matchedPairs++;
+                this.score += 10;
+                this.updateUI();
+                
+                if (this.matchedPairs === 8) {
+                    this.gameWon();
+                }
+            }, 500);
+        } else {
+            // Eşleşme değil
+            setTimeout(() => {
+                card1.classList.remove('flipped');
+                card2.classList.remove('flipped');
+            }, 1000);
+        }
+        
+        // Seçilen kartları temizle
+        this.flippedCards = [];
+    }
+    
+    gameWon() {
+        this.isRunning = false;
+        this.score += 100;
+        document.getElementById('memory-status').textContent = 'Tebrikler! Kazandınız! 🎉';
+        
+        if (typeof showNotification === 'function') {
+            showNotification('Tebrikler! Tüm kartları eşleştirdiniz! 🎉', 'success');
+        }
+    }
+    
+    updateUI() {
+        document.getElementById('memory-score').textContent = this.score;
+        document.getElementById('memory-matches').textContent = this.matchedPairs;
+    }
+    
+    start() {
+        this.isRunning = true;
+        document.getElementById('memory-status').textContent = 'Kartları eşleştirin';
+    }
+    
+    stop() {
+        this.isRunning = false;
+    }
+    
+    pause() {
+        this.paused = !this.paused;
+        document.getElementById('memory-status').textContent = this.paused ? 'Duraklatıldı' : 'Kartları eşleştirin';
+    }
+    
+    reset() {
+        this.cards = [];
+        this.flippedCards = [];
+        this.matchedPairs = 0;
+        this.score = 0;
+        this.level = 1;
+        this.lives = 3;
+        this.paused = false;
+        this.createBoard();
+        this.updateUI();
+    }
+}
+
+// Pong Oyunu (Canvas tabanlı - sadece bu oyun canvas kullanır)
+class Pong {
+    constructor(canvasId) {
+        this.canvasId = canvasId;
+        this.canvas = document.getElementById(canvasId);
+        this.ctx = this.canvas.getContext('2d');
+        
+        this.canvas.width = 600;
+        this.canvas.height = 400;
+        
+        this.ball = {x: 300, y: 200, vx: 4, vy: 4, radius: 8};
+        this.paddle1 = {x: 20, y: 150, width: 10, height: 100, score: 0};
+        this.paddle2 = {x: 570, y: 150, width: 10, height: 100, score: 0};
+        
+        this.score = 0;
+        this.level = 1;
+        this.lives = 3;
+        this.paused = false;
+        this.isRunning = false;
+        this.gameLoop = null;
+        
+        this.setupControls();
+    }
+    
+    setupControls() {
+        this.handleKeyPress = (e) => {
+            if (this.paused || !this.isRunning) return;
+            
+            switch(e.key) {
+                case 'ArrowUp':
+                case 'w':
+                    this.paddle1.y = Math.max(0, this.paddle1.y - 20);
+                    break;
+                case 'ArrowDown':
+                case 's':
+                    this.paddle1.y = Math.min(this.canvas.height - this.paddle1.height, this.paddle1.y + 20);
+                    break;
+            }
+        };
+        
+        document.addEventListener('keydown', this.handleKeyPress);
+    }
+    
+    update() {
+        if (!this.isRunning || this.paused) return;
+        
+        // Topu hareket ettir
+        this.ball.x += this.ball.vx;
+        this.ball.y += this.ball.vy;
+        
+        // Duvar çarpışması
+        if (this.ball.y - this.ball.radius <= 0 || this.ball.y + this.ball.radius >= this.canvas.height) {
+            this.ball.vy = -this.ball.vy;
+        }
+        
+        // Paddle çarpışması
+        if (this.ball.x - this.ball.radius <= this.paddle1.x + this.paddle1.width &&
+            this.ball.x + this.ball.radius >= this.paddle1.x &&
+            this.ball.y >= this.paddle1.y &&
+            this.ball.y <= this.paddle1.y + this.paddle1.height) {
+            this.ball.vx = Math.abs(this.ball.vx);
+            this.score += 5;
+        }
+        
+        if (this.ball.x + this.ball.radius >= this.paddle2.x &&
+            this.ball.x - this.ball.radius <= this.paddle2.x + this.paddle2.width &&
+            this.ball.y >= this.paddle2.y &&
+            this.ball.y <= this.paddle2.y + this.paddle2.height) {
+            this.ball.vx = -Math.abs(this.ball.vx);
+        }
+        
+        // AI paddle hareketi
+        const aiSpeed = 3;
+        if (this.ball.y < this.paddle2.y + this.paddle2.height / 2 - 20) {
+            this.paddle2.y = Math.max(0, this.paddle2.y - aiSpeed);
+        } else if (this.ball.y > this.paddle2.y + this.paddle2.height / 2 + 20) {
+            this.paddle2.y = Math.min(this.canvas.height - this.paddle2.height, this.paddle2.y + aiSpeed);
+        }
+        
+        // Gol kontrolü
+        if (this.ball.x < 0) {
+            this.paddle2.score++;
+            this.resetBall();
+        } else if (this.ball.x > this.canvas.width) {
+            this.paddle1.score++;
+            this.score += 50;
+            this.resetBall();
+        }
+        
+        this.updateUI();
+    }
+    
+    resetBall() {
+        this.ball.x = this.canvas.width / 2;
+        this.ball.y = this.canvas.height / 2;
+        this.ball.vx = (Math.random() > 0.5 ? 1 : -1) * 4;
+        this.ball.vy = (Math.random() - 0.5) * 4;
+    }
+    
+    render() {
+        // Temizle
+        this.ctx.fillStyle = '#111';
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Orta çizgi
+        this.ctx.strokeStyle = '#333';
+        this.ctx.setLineDash([5, 5]);
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.canvas.width / 2, 0);
+        this.ctx.lineTo(this.canvas.width / 2, this.canvas.height);
+        this.ctx.stroke();
+        this.ctx.setLineDash([]);
+        
+        // Paddle'lar
+        this.ctx.fillStyle = '#00f0f0';
+        this.ctx.fillRect(this.paddle1.x, this.paddle1.y, this.paddle1.width, this.paddle1.height);
+        
+        this.ctx.fillStyle = '#f00000';
+        this.ctx.fillRect(this.paddle2.x, this.paddle2.y, this.paddle2.width, this.paddle2.height);
+        
+        // Top
+        this.ctx.fillStyle = '#ffffff';
+        this.ctx.beginPath();
+        this.ctx.arc(this.ball.x, this.ball.y, this.ball.radius, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Skorlar
+        this.ctx.fillStyle = '#ffffff';
+        this.ctx.font = '30px Arial';
+        this.ctx.fillText(this.paddle1.score, this.canvas.width / 4, 40);
+        this.ctx.fillText(this.paddle2.score, 3 * this.canvas.width / 4, 40);
+    }
+    
+    updateUI() {
+        // UI güncelleme (main.js'den çağrılır)
+    }
+    
+    start() {
+        this.isRunning = true;
+        this.resetBall();
+        
+        this.gameLoop = setInterval(() => {
+            this.update();
+            this.render();
+        }, 1000 / 60);
+    }
+    
+    stop() {
+        this.isRunning = false;
+        if (this.gameLoop) {
+            clearInterval(this.gameLoop);
+            this.gameLoop = null;
+        }
+        document.removeEventListener('keydown', this.handleKeyPress);
+    }
+    
+    pause() {
+        this.paused = !this.paused;
+    }
+    
+    reset() {
+        this.paddle1.score = 0;
+        this.paddle2.score = 0;
+        this.score = 0;
+        this.level = 1;
+        this.lives = 3;
+        this.paused = false;
+        this.resetBall();
+    }
+}
+
+// Uzay Savunması Oyunu (Canvas tabanlı - sadece bu oyun canvas kullanır)
+class SpaceInvaders {
+    constructor(canvasId) {
+        this.canvasId = canvasId;
+        this.canvas = document.getElementById(canvasId);
+        this.ctx = this.canvas.getContext('2d');
+        
+        this.canvas.width = 600;
+        this.canvas.height = 500;
+        
+        this.player = {x: 275, y: 450, width: 50, height: 30, speed: 5};
+        this.bullets = [];
+        this.enemies = [];
+        this.enemyBullets = [];
+        this.score = 0;
+        this.level = 1;
+        this.lives = 3;
+        this.paused = false;
+        this.isRunning = false;
+        this.gameLoop = null;
+        this.gameOver = false;
+        
+        this.setupControls();
+        this.initializeEnemies();
+    }
+    
+    setupControls() {
+        this.handleKeyPress = (e) => {
+            if (this.paused || !this.isRunning) return;
+            
+            switch(e.key) {
+                case 'ArrowLeft':
+                case 'a':
+                    this.player.x = Math.max(0, this.player.x - this.player.speed);
+                    break;
+                case 'ArrowRight':
+                case 'd':
+                    this.player.x = Math.min(this.canvas.width - this.player.width, this.player.x + this.player.speed);
+                    break;
+                case ' ':
+                    this.shoot();
+                    break;
+            }
+        };
+        
+        document.addEventListener('keydown', this.handleKeyPress);
+    }
+    
+    initializeEnemies() {
+        this.enemies = [];
+        for (let row = 0; row < 4; row++) {
+            for (let col = 0; col < 8; col++) {
+                this.enemies.push({
+                    x: col * 60 + 50,
+                    y: row * 40 + 50,
+                    width: 40,
+                    height: 30,
+                    alive: true
+                });
+            }
+        }
+    }
+    
+    shoot() {
+        this.bullets.push({
+            x: this.player.x + this.player.width / 2,
+            y: this.player.y,
+            width: 4,
+            height: 10,
+            speed: 8
+        });
+    }
+    
+    update() {
+        if (!this.isRunning || this.paused) return;
+        
+        // Mermileri hareket ettir
+        this.bullets = this.bullets.filter(bullet => {
+            bullet.y -= bullet.speed;
+            return bullet.y > 0;
+        });
+        
+        // Düşman mermileri
+        if (Math.random() < 0.01) {
+            const aliveEnemies = this.enemies.filter(e => e.alive);
+            if (aliveEnemies.length > 0) {
+                const enemy = aliveEnemies[Math.floor(Math.random() * aliveEnemies.length)];
+                this.enemyBullets.push({
+                    x: enemy.x + enemy.width / 2,
+                    y: enemy.y + enemy.height,
+                    width: 4,
+                    height: 10,
+                    speed: 3
+                });
+            }
+        }
+        
+        this.enemyBullets = this.enemyBullets.filter(bullet => {
+            bullet.y += bullet.speed;
+            
+            // Oyuncu çarpışması
+            if (bullet.x < this.player.x + this.player.width &&
+                bullet.x + bullet.width > this.player.x &&
+                bullet.y < this.player.y + this.player.height &&
+                bullet.y + bullet.height > this.player.y) {
+                this.lives--;
+                if (this.lives <= 0) {
+                    this.gameOver = true;
+                }
+                return false;
+            }
+            
+            return bullet.y < this.canvas.height;
+        });
+        
+        // Çarpışma kontrolü
+        this.bullets.forEach((bullet, bulletIndex) => {
+            this.enemies.forEach(enemy => {
+                if (enemy.alive &&
+                    bullet.x < enemy.x + enemy.width &&
+                    bullet.x + bullet.width > enemy.x &&
+                    bullet.y < enemy.y + enemy.height &&
+                    bullet.y + bullet.height > enemy.y) {
+                    enemy.alive = false;
+                    this.bullets.splice(bulletIndex, 1);
+                    this.score += 10;
+                    
+                    if (this.enemies.every(e => !e.alive)) {
+                        this.level++;
+                        this.initializeEnemies();
+                    }
+                }
+            });
+        });
+    }
+    
+    render() {
+        // Temizle
+        this.ctx.fillStyle = '#000';
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Yıldızlar
+        for (let i = 0; i < 50; i++) {
+            this.ctx.fillStyle = '#fff';
+            this.ctx.fillRect(
+                (i * 37) % this.canvas.width,
+                (i * 23) % this.canvas.height,
+                1, 1
+            );
+        }
+        
+        // Oyuncu
+        this.ctx.fillStyle = '#00f0f0';
+        this.ctx.fillRect(this.player.x, this.player.y, this.player.width, this.player.height);
+        
+        // Mermiler
+        this.ctx.fillStyle = '#ffff00';
+        this.bullets.forEach(bullet => {
+            this.ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+        });
+        
+        // Düşman mermileri
+        this.ctx.fillStyle = '#ff0000';
+        this.enemyBullets.forEach(bullet => {
+            this.ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+        });
+        
+        // Düşmanlar
+        this.ctx.fillStyle = '#f00000';
+        this.enemies.forEach(enemy => {
+            if (enemy.alive) {
+                this.ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+            }
+        });
+        
+        // Oyun bitiş
+        if (this.gameOver) {
+            this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+            
+            this.ctx.fillStyle = '#ffffff';
+            this.ctx.font = '30px Arial';
+            this.ctx.textAlign = 'center';
+            this.ctx.fillText('Oyun Bitti!', this.canvas.width / 2, this.canvas.height / 2);
+            this.ctx.font = '20px Arial';
+            this.ctx.fillText(`Skor: ${this.score}`, this.canvas.width / 2, this.canvas.height / 2 + 40);
+        }
+    }
+    
+    updateUI() {
+        // UI güncelleme (main.js'den çağrılır)
+    }
+    
+    start() {
+        this.isRunning = true;
+        this.gameOver = false;
+        
+        this.gameLoop = setInterval(() => {
+            this.update();
+            this.render();
+        }, 1000 / 60);
+    }
+    
+    stop() {
+        this.isRunning = false;
+        if (this.gameLoop) {
+            clearInterval(this.gameLoop);
+            this.gameLoop = null;
+        }
+        document.removeEventListener('keydown', this.handleKeyPress);
+    }
+    
+    pause() {
+        this.paused = !this.paused;
+    }
+    
+    reset() {
+        this.bullets = [];
+        this.enemyBullets = [];
+        this.score = 0;
+        this.level = 1;
+        this.lives = 3;
+        this.paused = false;
+        this.gameOver = false;
+        this.player.x = 275;
+        this.initializeEnemies();
+    }
+}
+
+// Oyun Yönetici
+class GameManager {
+    constructor() {
+        this.currentGame = null;
+        this.uiUpdateInterval = null;
+        this.games = {
+            xox: TicTacToe,
+            snake: Snake,
+            memory: Memory,
+            pong: Pong,
+            space: SpaceInvaders,
+            tetris: Tetris
+        };
+    }
+
+    startGame(gameType) {
+        console.log('🎮 GameManager.startGame() çağrıldı, gameType:', gameType);
+        
+        if (this.currentGame) {
+            this.currentGame.stop();
+        }
+
+        const GameClass = this.games[gameType];
+        console.log('🎮 GameClass:', GameClass);
+        
+        if (!GameClass) return;
+        
+        const container = document.getElementById('game-canvas-container');
+        
+        // Pong ve Space canvas kullanıyor, diğerleri kullanmıyor
+        const canvasGames = ['pong', 'space'];
+        
+        if (canvasGames.includes(gameType)) {
+            // Canvas'ı geri ekle
+            container.innerHTML = '<canvas id="game-canvas" width="600" height="500"></canvas>';
+            console.log('🎨 Canvas oyunu için canvas eklendi');
+        } else {
+            // HTML tabanlı oyunlar için temizle
+            container.innerHTML = '';
+            console.log('🧹 HTML oyunu için container temizlendi');
+        }
+        
+        this.currentGame = new GameClass('game-canvas');
+        console.log('🎮 Oyun nesnesi oluşturuldu:', this.currentGame);
+        this.currentGame.start();
+        console.log('🎮 Oyun başlatıldı');
+        
+        // UI güncelleme interval'ı başlat
+        if (this.uiUpdateInterval) {
+            clearInterval(this.uiUpdateInterval);
+        }
+        this.uiUpdateInterval = setInterval(() => this.updateUI(), 500);
+        
+        this.updateUI();
+    }
+
+    pauseGame() {
+        if (this.currentGame) {
+            this.currentGame.pause();
+        }
+    }
+
+    restartGame() {
+        if (this.currentGame) {
+            this.currentGame.reset();
+            this.currentGame.start();
+            this.updateUI();
+        }
+    }
+
+    quitGame() {
+        if (this.currentGame) {
+            this.currentGame.stop();
+            this.currentGame = null;
+        }
+        
+        // UI güncelleme interval'ını temizle
+        if (this.uiUpdateInterval) {
+            clearInterval(this.uiUpdateInterval);
+            this.uiUpdateInterval = null;
+        }
+        
+        showMenu();
+    }
+
+    updateUI() {
+        if (this.currentGame) {
+            document.getElementById('score').textContent = `Skor: ${this.currentGame.score}`;
+            document.getElementById('level').textContent = `Seviye: ${this.currentGame.level}`;
+            document.getElementById('lives').textContent = `Can: ${this.currentGame.lives}`;
+        }
+    }
+}
+
+// Global oyun yöneticisi
+const gameManager = new GameManager();
+
+// Global olarak ata
+window.gameManager = gameManager;
