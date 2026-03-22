@@ -1,175 +1,126 @@
-# 🎮 Efsanevi Mini Oyunlar - Online Oyun Platformu
+# 🎮 Efsanevi Mini Oyunlar
+### *created by burakcskan ✰*
 
-## 🌟 Özellikler
+<div align="center">
 
-### Tasarım
-- 🎨 **Modern Dark Theme**: Kelime Savaşı projesi temalı koyu tasarım
-- 🌈 **Gradient Animasyonları**: Dinamik renk geçişleri
-- 📱 **Responsive Design**: Mobil uyumlu
-- 🎯 **İnteraktif UI**: Hover efektleri ve animasyonlar
+![Platform](https://img.shields.io/badge/Platform-Web-6366f1?style=for-the-badge)
+![Language](https://img.shields.io/badge/Language-JavaScript-f0db4f?style=for-the-badge)
+![Backend](https://img.shields.io/badge/Backend-Python-3776ab?style=for-the-badge)
+![Multiplayer](https://img.shields.io/badge/Multiplayer-WebSocket-10b981?style=for-the-badge)
 
-### Renk Paleti
-- **Primary**: Indigo (#6366f1)
-- **Secondary**: Purple (#8b5cf6)
-- **Accent**: Pink (#ec4899)
-- **Background**: Dark slate (#0f172a)
-- **Text**: Light gray (#f1f5f9)
+**Gerçek zamanlı 2 kişilik online oyun platformu.**
+Arkadaşınla aynı odaya gir, oyna, kazan!
 
-### Oyunlar
-- ❌⭕ **XOX (Tic-Tac-Toe)** - Klasik üçleme oyunu
-- 🐍 **Yılan (Snake)** - Yılanı büyüt, puan topla
-- 🧩 **Tetris** - Küp yerleştirme oyunu
-- 🧠 **Hafıza Oyunu** - Eşleştirme oyunu
-- 🏓 **Pong** - Klasik raket oyunu
-- 🚀 **Uzay Savunması** - Asteroidleri yok et
+</div>
 
-### Profesyonel Özellikler
-- 🎨 Modern ve responsive tasarım
-- 🎵 Ses efektleri ve müzik
-- 🏆 Yüksek skor sistemi
-- ✨ Parçacık efektleri ve animasyonlar
-- 🔒 Güvenlik önlemleri
-- 📱 Mobil uyumlu
-- 👥 **Multiplayer Modu** - Gerçek zamanlı çok oyunculu oyunlar
+---
 
-### Multiplayer Özellikleri
-- 💬 **Gerçek Zamanlı Chat** - Oda içi sohbet
-- 🎯 **Multiplayer XOX** - Turn-based oyun
-- 🏠 **Oda Sistemi** - Room1, Room2, Room3
-- 🌐 **İnternet Erişimi** - Ngrok ile global erişim
+## 🕹️ Oyunlar
 
-## 🚀 Kurulum ve Çalıştırma
+| Oyun | Açıklama | Oyuncu |
+|------|----------|--------|
+| ❌⭕ **XOX** | Klasik üçleme oyunu, sırayla oyna | 2 kişi |
+| 🔴 **Dört Dörtlük** | Sütuna taş bırak, 4'ü birleştir | 2 kişi |
+| 🚢 **Amiral Battı** | Gemileri yerleştir, düşmanı bat | 2 kişi |
+| ✏️ **Adam Asmaca** | Kelimeyi tahmin et, asılmadan kaç | 2 kişi |
+| ♟️ **Dama** | Taşları ye, kral ol | 2 kişi |
+| 🎯 **Taş Kağıt Makas** | Aynı anda seç, en çok kazanan galip | 2 kişi |
+| 🧠 **Bilgi Yarışması** | Soruları cevapla, puan topla | 2 kişi |
+| 🎲 **Zar Oyunu** | Zar at, en yükseği kazan | 2 kişi |
+
+---
+
+## ✨ Özellikler
+
+- 🌐 **Gerçek Zamanlı Multiplayer** — WebSocket ile anlık oyun deneyimi
+- 💬 **Canlı Chat** — Her oyunda oda içi sohbet
+- 🏠 **Oda Sistemi** — 3 farklı oda, istediğin odaya katıl
+- 📱 **Mobil Uyumlu** — Telefon ve PC'de sorunsuz çalışır
+- 🎨 **Modern Tasarım** — Koyu tema, mor/mavi gradient renkler
+- ⚡ **Hızlı Bağlantı** — Serveo tunnel ile internet erişimi
+
+---
+
+## 🚀 Kurulum
 
 ### Gereksinimler
-- Python 3.7+
-- Modern web tarayıcısı
-- Ngrok (internet erişimi için)
-
-### Kurulum
 ```bash
-# Bağımlılıkları yükle
-pip install websockets
-
-# Veya sistem paket yöneticisi ile
-sudo apt install python3-websockets
+Python 3.7+
+pip install aiohttp
 ```
 
 ### Çalıştırma
 ```bash
-# Basit ve hızlı server (önerilen)
+# Sunucuyu başlat
 cd python
-python3 simple_server.py --host 0.0.0.0 --port 8000
+python3 integrated_server.py
 
-# Alternatif: Eski server
-python3 main.py server --host 0.0.0.0 --port 8000
+# İnternet erişimi için (yeni terminalde)
+ssh -o StrictHostKeyChecking=no -R 80:localhost:8001 serveo.net
+```
 
-# İnternet erişimi için ngrok'u ayrı terminalde başlat
-ngrok http 8000
+### Kolay Başlatma
+```bash
+# Masaüstündeki script ile tek komutla başlat
+bash ~/Masaüstü/burakprojestart.sh
 ```
 
 ### Erişim
-- **Local:** http://localhost:8000
-- **İnternet:** ngrok URL'si (örnek: https://xxxxx.ngrok-free.dev)
-
-## 🎮 Nasıl Oynanır
-
-### Tek Oyunculu
-1. Ana sayfadan oyun seç
-2. Klavye/ok tuşları ile kontrol et
-3. Skorunu kaydet
-
-### Çok Oyunculu
-1. "👥 Multiplayer" butonuna tıkla
-2. Oda seç (Room1, Room2, Room3)
-3. Chat ile arkadaşlarını davet et
-4. XOX oyununu başlat
-
-## 🛠️ Teknik Detaylar
-
-### Performans Optimizasyonları
-- ⚡ **ThreadingHTTPServer**: Çoklu bağlantı desteği
-- 🚀 **Buffer Optimizasyonu**: 64KB buffer size
-- 📝 **Azaltılmış Logging**: Sadece hatalar loglanır
-- 💾 **Cache Headers**: 1 saat browser cache
-- 🏠 **Oda Bazlı WebSocket**: Verimli mesaj yönlendirme
-
-### Teknolojiler
-- **Frontend:** HTML5, CSS3, JavaScript ES6+
-- **Backend:** Python 3 + WebSockets
-- **Real-time:** WebSocket protokolü
-- **Styling:** Modern CSS Grid/Flexbox
-- **Security:** CSP, XSS protection, HTTPS
-
-### Dosya Yapısı
-```
-/
-├── html/           # HTML sayfaları
-├── css/            # Stil dosyaları
-├── js/             # JavaScript oyunları
-├── python/         # Backend sunucusu
-├── json/           # Veri dosyaları
-└── README.md       # Bu dosya
-```
-
-### Teknolojiler
-- **Frontend:** HTML5, CSS3, JavaScript ES6+
-- **Backend:** Python 3 + WebSockets
-- **Real-time:** WebSocket protokolü
-- **Styling:** Modern CSS Grid/Flexbox
-- **Security:** CSP, XSS protection, HTTPS
-
-### API Endpoints
-- `GET /` - Ana sayfa
-- `WS /ws` - WebSocket bağlantısı (port 8765)
-
-## 🔧 Gelişmiş Konfigürasyon
-
-### Sunucu Ayarları
-`json/config.json` dosyasını düzenleyin:
-```json
-{
-  "server": {
-    "host": "0.0.0.0",
-    "port": 8000,
-    "ssl": false
-  }
-}
-```
-
-### Güvenlik
-- Content Security Policy aktif
-- XSS koruması
-- HTTPS redirect
-- Güvenli header'lar
-
-## 📊 İstatistikler
-
-Sunucu istatistiklerini görüntüle:
-```bash
-python3 main.py stats
-```
-
-## 🗂️ Yedekleme
-
-Verileri yedekle:
-```bash
-python3 main.py backup
-```
-
-## 🎯 Gelecek Özellikler
-
-- [ ] Daha fazla multiplayer oyunu
-- [ ] Kullanıcı hesapları
-- [ ] Turnuva sistemi
-- [ ] Özel oda oluşturma
-- [ ] Sesli chat
-- [ ] Mobil uygulama
-
-## 📞 İletişim
-
-Bu proje Burak tarafından geliştirilmiştir.
-Herhangi bir sorun yaşarsanız lütfen bildirin!
+- **Local:** `http://localhost:8001`
+- **İnternet:** Serveo URL'si terminalde görünür
 
 ---
 
+## 📁 Dosya Yapısı
+
+```
+mine-adventures/
+├── html/
+│   └── index.html          # Ana sayfa (tüm oyunlar burada)
+├── css/
+│   └── style.css           # Stiller
+├── js/
+│   ├── main.js             # Ana uygulama
+│   ├── games.js            # Oyun motorları
+│   ├── multiplayer.js      # WebSocket sistemi
+│   └── audio.js            # Ses yönetimi
+├── python/
+│   ├── integrated_server.py # Ana sunucu (aiohttp)
+│   └── ...
+├── json/
+│   └── config.json         # Sunucu ayarları
+└── README.md
+```
+
+---
+
+## 🛠️ Teknolojiler
+
+| Alan | Teknoloji |
+|------|-----------|
+| Frontend | HTML5, CSS3, JavaScript ES6+ |
+| Backend | Python 3 + aiohttp |
+| Gerçek Zamanlı | WebSocket |
+| Tünel | Serveo.net |
+| Stil | CSS Grid, Flexbox, Animations |
+
+---
+
+## 🎯 Nasıl Oynanır?
+
+1. **Siteyi aç** — Serveo URL'sini tarayıcıda açın
+2. **Oyun seç** — Ana menüden istediğin oyuna tıkla
+3. **İsim gir** — Oyuncu adını yaz
+4. **Oda seç** — Oda 1, 2 veya 3'e katıl
+5. **Arkadaşını bekle** — Aynı odaya girince oyun otomatik başlar
+6. **Oyna!** — Sırayla hamle yap, chat'ten konuş, kazan 🏆
+
+---
+
+<div align="center">
+
 **🎮 İyi eğlenceler!**
+
+*burakcskan ✰*
+
+</div>
